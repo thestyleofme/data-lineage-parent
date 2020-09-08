@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.ql.hooks.Entity;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.isaac.hive.hook.HiveHookContext;
 import org.isaac.hive.hook.entity.HiveEntity;
@@ -28,17 +29,16 @@ public class CreateTable extends BaseHiveEvent {
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }
 
-    public HiveEntity getEntity() throws Exception {
+    public HiveEntity getEntity() throws HiveException {
         HiveEntity ret = context.createHiveEntity();
         ret.setTypeName(HIVE_TYPE_TABLE);
         Table table = null;
         Entity currEntity = null;
-
         for (Entity entity : getHiveContext().getOutputs()) {
             if (entity.getType() == Entity.Type.TABLE) {
                 currEntity = entity;
@@ -57,17 +57,14 @@ public class CreateTable extends BaseHiveEvent {
                 }
             }
         }
-
         if (table != null) {
             Map<String, Object> tblEntity = toTableEntity(table);
             // add table partition
             addTablePartition(tblEntity, currEntity.getPartition());
             ret.setAttribute(HIVE_TYPE_TABLE, tblEntity);
-
             if (isHBaseStore(table)) {
                 // This create lineage to HBase table in case of Hive on HBase
                 Map<String, Object> hbaseTableEntity = toReferencedHBaseTable(table);
-
                 if (hbaseTableEntity != null) {
                     if (TableType.EXTERNAL_TABLE.equals(table.getTableType())) {
                         ret.setAttribute(ATTRIBUTE_INPUTS, Collections.singletonList(hbaseTableEntity));
@@ -77,7 +74,7 @@ public class CreateTable extends BaseHiveEvent {
                 }
             } else {
                 if (TableType.EXTERNAL_TABLE.equals(table.getTableType())) {
-                    Map<String, Object> hdfsPathEntity = getHDFSPathEntity(table.getDataLocation());
+                    Map<String, Object> hdfsPathEntity = getHdfsPathEntity(table.getDataLocation());
                     ret.setAttribute(ATTRIBUTE_INPUTS, Collections.singletonList(hdfsPathEntity));
                 }
             }

@@ -18,7 +18,7 @@ public class DefaultEvent extends BaseHiveEvent {
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() {
         HiveEntity ret = context.createHiveEntity();
         ret.setTypeName(HIVE_TYPE_DEFAULT);
         return context.toJson(ret.getResult());

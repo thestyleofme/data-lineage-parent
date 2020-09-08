@@ -7,6 +7,7 @@ import org.apache.hadoop.hive.ql.hooks.Entity;
 import org.apache.hadoop.hive.ql.hooks.HookContext;
 import org.apache.hadoop.hive.ql.hooks.ReadEntity;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.isaac.hive.hook.HiveHookContext;
 import org.isaac.hive.hook.entity.HiveEntity;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.0.0
  */
 public class CreateHiveProcess extends BaseHiveEvent {
+
     private static final Logger LOG = LoggerFactory.getLogger(CreateHiveProcess.class);
 
     public CreateHiveProcess(HiveHookContext context) {
@@ -31,12 +33,12 @@ public class CreateHiveProcess extends BaseHiveEvent {
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }
 
-    public HiveEntity getEntity() throws Exception {
+    public HiveEntity getEntity() throws HiveException {
         HiveEntity ret = context.createHiveEntity();
         ret.setTypeName(HIVE_TYPE_PROCESS);
 

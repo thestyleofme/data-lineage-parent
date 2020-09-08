@@ -26,13 +26,14 @@ import org.isaac.hive.hook.HiveHookContext;
  * @since 1.0.0
  */
 public abstract class BaseHiveEvent {
+
     public static final String HIVE_ENTITY_TYPE = "entity_type";
 
     public static final String HIVE_TYPE_DEFAULT = "hive_default";
 
     public static final String HIVE_TYPE_DB = "hive_db";
     public static final String HIVE_TYPE_TABLE = "hive_table";
-    public static final String HIVE_TYPE_STORAGEDESC = "hive_storagedesc";
+    public static final String HIVE_TYPE_STORAGE_DESC = "hive_storage_desc";
     public static final String HIVE_TYPE_COLUMN = "hive_column";
     public static final String HIVE_TYPE_PROCESS = "hive_process";
     public static final String HIVE_TYPE_COLUMN_LINEAGE = "hive_column_lineage";
@@ -59,7 +60,7 @@ public abstract class BaseHiveEvent {
     public static final String ATTRIBUTE_TEMPORARY = "temporary";
     public static final String ATTRIBUTE_RETENTION = "retention";
     public static final String ATTRIBUTE_DB = "db";
-    public static final String ATTRIBUTE_STORAGEDESC = "sd";
+    public static final String ATTRIBUTE_STORAGE_DESC = "sd";
     public static final String ATTRIBUTE_PARTITION = "partition";
     public static final String ATTRIBUTE_PARTITION_PATHS = "partitionPaths";
     public static final String ATTRIBUTE_PARTITION_VALUES = "partitionValues";
@@ -78,7 +79,7 @@ public abstract class BaseHiveEvent {
     public static final String ATTRIBUTE_COL_TYPE = "type";
     public static final String ATTRIBUTE_COL_POSITION = "position";
     public static final String ATTRIBUTE_PATH = "path";
-    public static final String ATTRIBUTE_NAMESERVICE_ID = "nameServiceId";
+    public static final String ATTRIBUTE_NAME_SERVICE_ID = "nameServiceId";
     public static final String ATTRIBUTE_INPUTS = "inputs";
     public static final String ATTRIBUTE_OUTPUTS = "outputs";
     public static final String ATTRIBUTE_OPERATION_TYPE = "operationType";
@@ -90,7 +91,7 @@ public abstract class BaseHiveEvent {
     public static final String ATTRIBUTE_END_TIME = "endTime";
     public static final String ATTRIBUTE_RECENT_QUERIES = "recentQueries";
     public static final String ATTRIBUTE_QUERY = "query";
-    public static final String ATTRIBUTE_DEPENDENCY_TYPE = "depenendencyType";
+    public static final String ATTRIBUTE_DEPENDENCY_TYPE = "dependencyType";
     public static final String ATTRIBUTE_EXPRESSION = "expression";
     public static final String ATTRIBUTE_ALIASES = "aliases";
     public static final String ATTRIBUTE_URI = "uri";
@@ -123,7 +124,7 @@ public abstract class BaseHiveEvent {
         return context;
     }
 
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         return null;
     }
 
@@ -136,7 +137,7 @@ public abstract class BaseHiveEvent {
         return table.getTTable() != null ? (table.getOwner()) : "";
     }
 
-    protected Map<String, Object> getInputOutputEntity(Entity entity) throws Exception {
+    protected Map<String, Object> getInputOutputEntity(Entity entity) throws HiveException {
         Map<String, Object> ret = null;
         switch (entity.getType()) {
             case TABLE:
@@ -149,27 +150,28 @@ public abstract class BaseHiveEvent {
         return ret;
     }
 
-    protected Map<String, Object> toHiveEntity(Entity entity) throws Exception {
+    protected Map<String, Object> toHiveEntity(Entity entity) throws HiveException {
         Map<String, Object> ret = null;
 
         switch (entity.getType()) {
-            case DATABASE: {
+            case DATABASE:
                 Database db = getHive().getDatabase(entity.getDatabase().getName());
                 ret = toDbEntity(db);
-            }
-            break;
+                break;
             case TABLE:
-            case PARTITION: {
+            case PARTITION:
                 ret = toTableEntity(entity);
-            }
-            break;
-            case DFS_DIR: {
-                URI location = entity.getLocation();
-                if (location != null) {
-                    ret = getHDFSPathEntity(new Path(entity.getLocation()));
+                break;
+            case DFS_DIR:
+                try {
+                    URI location = entity.getLocation();
+                    if (location != null) {
+                        ret = getHdfsPathEntity(new Path(entity.getLocation()));
+                    }
+                } catch (Exception e) {
+                    throw new HiveException(e);
                 }
-            }
-            break;
+                break;
             default:
                 break;
         }
@@ -201,7 +203,7 @@ public abstract class BaseHiveEvent {
         return ret;
     }
 
-    protected Map<String, Object> toTableEntity(Entity entity) throws Exception {
+    protected Map<String, Object> toTableEntity(Entity entity) throws HiveException {
         Table table = getHive().getTable(entity.getTable().getDbName(), entity.getTable().getTableName());
 
         Map<String, Object> ret = toTableEntity(table);
@@ -211,7 +213,7 @@ public abstract class BaseHiveEvent {
         return ret;
     }
 
-    protected void addTablePartition(Map<String, Object> objectMap, Partition partition) throws Exception {
+    protected void addTablePartition(Map<String, Object> objectMap, Partition partition) {
         if (partition != null) {
             objectMap.put(ATTRIBUTE_PARTITION, toPartitionEntity(partition));
         }
@@ -263,7 +265,7 @@ public abstract class BaseHiveEvent {
 
             // set storage desc
             Map<String, Object> sd = getStorageDescEntity(table);
-            ret.put(ATTRIBUTE_STORAGEDESC, sd);
+            ret.put(ATTRIBUTE_STORAGE_DESC, sd);
 
             context.putEntity(tblQualifiedName, ret);
         }
@@ -299,7 +301,7 @@ public abstract class BaseHiveEvent {
 
         StorageDescriptor sd = table.getSd();
 
-        ret.put(HIVE_ENTITY_TYPE, HIVE_TYPE_STORAGEDESC);
+        ret.put(HIVE_ENTITY_TYPE, HIVE_TYPE_STORAGE_DESC);
         ret.put(ATTRIBUTE_TABLE, table.getTableName());
         ret.put(ATTRIBUTE_QUALIFIED_NAME, sdQualifiedName);
         ret.put(ATTRIBUTE_PARAMETERS, sd.getParameters());
@@ -329,12 +331,10 @@ public abstract class BaseHiveEvent {
             List<Map<String, Object>> sortCols = new ArrayList<>(sd.getSortCols().size());
 
             for (Order sdSortCol : sd.getSortCols()) {
-                Map<String, Object> sortcol = new HashMap<>();
-
-                sortcol.put("col", sdSortCol.getCol());
-                sortcol.put("order", sdSortCol.getOrder());
-
-                sortCols.add(sortcol);
+                Map<String, Object> sortCol = new HashMap<>();
+                sortCol.put("col", sdSortCol.getCol());
+                sortCol.put("order", sdSortCol.getOrder());
+                sortCols.add(sortCol);
             }
 
             ret.put(ATTRIBUTE_SORT_COLS, sortCols);
@@ -368,7 +368,7 @@ public abstract class BaseHiveEvent {
         return ret;
     }
 
-    protected Map<String, Object> getHDFSPathEntity(Path path) {
+    protected Map<String, Object> getHdfsPathEntity(Path path) {
         // HDFS_TYPE_PATH
         String strPath = path.toString().toLowerCase();
 
@@ -389,7 +389,7 @@ public abstract class BaseHiveEvent {
         return context.getHiveContext();
     }
 
-    protected String getQualifiedName(Entity entity) throws Exception {
+    protected String getQualifiedName(Entity entity) throws HiveException {
         switch (entity.getType()) {
             case DATABASE:
                 return getQualifiedName(entity.getDatabase());
@@ -397,7 +397,11 @@ public abstract class BaseHiveEvent {
             case PARTITION:
                 return getQualifiedName(entity.getTable());
             case DFS_DIR:
-                return getQualifiedName(entity.getLocation());
+                try {
+                    return getQualifiedName(entity.getLocation());
+                } catch (Exception e) {
+                    throw new HiveException(e);
+                }
             default:
                 return null;
         }
@@ -453,7 +457,7 @@ public abstract class BaseHiveEvent {
     }
 
     protected Map<String, Object> toReferencedHBaseTable(Table table) {
-        //HBASE_TYPE_TABLE
+        // HBASE_TYPE_TABLE
         Map<String, Object> ret = null;
         HBaseTableInfo hBaseTableInfo = new HBaseTableInfo(table);
         String hbaseNameSpace = hBaseTableInfo.getHbaseNameSpace();

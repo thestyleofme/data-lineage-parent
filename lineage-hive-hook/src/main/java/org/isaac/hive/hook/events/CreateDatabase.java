@@ -2,6 +2,7 @@ package org.isaac.hive.hook.events;
 
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.ql.hooks.Entity;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.isaac.hive.hook.HiveHookContext;
 import org.isaac.hive.hook.entity.HiveEntity;
 
@@ -14,17 +15,18 @@ import org.isaac.hive.hook.entity.HiveEntity;
  * @since 1.0.0
  */
 public class CreateDatabase extends BaseHiveEvent {
+
     public CreateDatabase(HiveHookContext context) {
         super(context);
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }
 
-    public HiveEntity getEntity() throws Exception {
+    public HiveEntity getEntity() throws HiveException {
         HiveEntity ret = context.createHiveEntity();
         ret.setTypeName(HIVE_TYPE_DB);
 

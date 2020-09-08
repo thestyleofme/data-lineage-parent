@@ -3,6 +3,7 @@ package org.isaac.hive.hook;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import org.apache.commons.configuration2.Configuration;
@@ -10,7 +11,6 @@ import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.isaac.hive.hook.exceptions.HiveHookException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +31,8 @@ public final class ApplicationProperties extends PropertiesConfiguration {
 
     private static volatile Configuration instance = null;
 
-    private ApplicationProperties(URL url) throws ConfigurationException {
-        Parameters params = new Parameters();
-        FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
-                new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
-                        .configure(params.properties()
-                                .setFileName(url.getFile()));
-        instance = builder.getConfiguration();
+    private ApplicationProperties() {
+
     }
 
     public static void forceReload() {
@@ -107,7 +102,7 @@ public final class ApplicationProperties extends PropertiesConfiguration {
         try {
             URL url = ApplicationProperties.class.getProtectionDomain().getCodeSource().getLocation();
             if (url != null) {
-                filePath = URLDecoder.decode(url.getPath(), "utf-8");
+                filePath = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
                 filePath = filePath.replace("\\", "/");
                 if (filePath.endsWith(".jar")) {
                     filePath = filePath.substring(0, filePath.lastIndexOf("/") + 1);
@@ -116,7 +111,7 @@ public final class ApplicationProperties extends PropertiesConfiguration {
                 filePath = file.getAbsolutePath();
             }
         } catch (Exception e) {
-            //ignore
+            // ignore
             filePath = null;
         }
         return filePath;

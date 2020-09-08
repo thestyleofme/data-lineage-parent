@@ -12,7 +12,7 @@ import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.isaac.hive.hook.HiveHookContext;
-import org.isaac.hive.hook.exceptions.SQLParseException;
+import org.isaac.hive.hook.exceptions.SqlParseException;
 import org.isaac.hive.hook.exceptions.UnSupportedException;
 import org.isaac.hive.hook.lineage.bean.ColumnBlock;
 import org.isaac.hive.hook.lineage.bean.ColumnLineage;
@@ -333,7 +333,7 @@ public class LineageParser {
                             for (String tables : tableArr) {
                                 String[] split = tables.split("\\.");
                                 if (split.length > 2) {
-                                    throw new SQLParseException("parse table:" + nowTable);
+                                    throw new SqlParseException("parse table:" + nowTable);
                                 }
                                 List<String> colByTab = context.getColumnByTableName(tables);
                                 for (String column : colByTab) {
@@ -719,7 +719,7 @@ public class LineageParser {
         for (String tables : tableArray.split(SPLIT_AND)) {
             String[] split = tables.split("\\.");
             if (split.length > 2) {
-                throw new SQLParseException("parse table:" + tables);
+                throw new SqlParseException("parse table:" + tables);
             }
             List<String> colByTab = context.getColumnByTableName(tables);
             for (String col : colByTab) {
@@ -732,7 +732,7 @@ public class LineageParser {
 
         // check ambiguity sql
         if (cnt > 1) {
-            throw new SQLParseException("SQL is ambiguity, column: " + column + " tables:" + tableArray);
+            throw new SqlParseException("SQL is ambiguity, column: " + column + " tables:" + tableArray);
         }
 
         ColumnBlock bk = new ColumnBlock();
@@ -959,7 +959,7 @@ public class LineageParser {
         for (String tables : tableArr) {
             String[] split = tables.split("\\" + SPLIT_DOT);
             if (split.length > 2) {
-                throw new SQLParseException("parse table:" + tableNames);
+                throw new SqlParseException("parse table:" + tableNames);
             }
             if (split.length == 2) {
                 sb.append(split[0]).append(SPLIT_DOT).append(split[1]).append(SPLIT_AND);
@@ -1019,7 +1019,7 @@ public class LineageParser {
     private void validateUnion(List<ColumnLineage> list) {
         int size = list.size();
         if (size % 2 == 1) {
-            throw new SQLParseException("union column number are different, size=" + size);
+            throw new SqlParseException("union column number are different, size=" + size);
         }
         int colNum = size / 2;
         checkUnion(list, 0, colNum);
@@ -1040,7 +1040,7 @@ public class LineageParser {
             if (StringUtils.isBlank(tmp)) {
                 tmp = col.getToTable();
             } else if (!tmp.equals(col.getToTable())) {
-                throw new SQLParseException(
+                throw new SqlParseException(
                         "union column number/types are different,table1=" + tmp + ",table2=" + col.getToTable());
             }
         }

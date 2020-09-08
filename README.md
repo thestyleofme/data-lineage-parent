@@ -1,6 +1,6 @@
-## lineage-hook-parent
+## data-lineage-parent
 
-> 数据血缘hook
+> 数据血缘分析
 
 ### lineage-hive-hook
 

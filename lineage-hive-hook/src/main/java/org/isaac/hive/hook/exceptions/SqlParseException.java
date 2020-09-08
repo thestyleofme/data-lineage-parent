@@ -8,19 +8,19 @@ package org.isaac.hive.hook.exceptions;
  * @author isaac 2020/9/7 16:57
  * @since 1.0.0
  */
-public class SQLParseException extends RuntimeException {
+public class SqlParseException extends RuntimeException {
 
     private static final long serialVersionUID = 7580524884309975467L;
 
-    public SQLParseException(String message, Throwable cause) {
+    public SqlParseException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public SQLParseException(String message) {
+    public SqlParseException(String message) {
         super(message);
     }
 
-    public SQLParseException(Throwable cause) {
+    public SqlParseException(Throwable cause) {
         super(cause);
     }
 }

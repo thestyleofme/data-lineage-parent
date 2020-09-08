@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.isaac.hive.hook.HiveHookContext;
 import org.isaac.hive.hook.entity.HiveEntity;
@@ -30,7 +31,7 @@ public class AlterTableRenameCol extends AlterTable {
     }
 
     @Override
-    public HiveEntity getEntity() throws Exception {
+    public HiveEntity getEntity() throws HiveException {
         if (CollectionUtils.isEmpty(getHiveContext().getInputs())) {
             return null;
         }

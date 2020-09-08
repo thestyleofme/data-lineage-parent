@@ -6,6 +6,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.ql.hooks.Entity;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.isaac.hive.hook.HiveHookContext;
 import org.isaac.hive.hook.entity.HiveEntity;
@@ -30,7 +31,7 @@ public class AlterTableRename extends BaseHiveEvent {
         return context.toJson(entity.getResult());
     }
 
-    public HiveEntity getEntity() throws Exception {
+    public HiveEntity getEntity() throws HiveException {
         HiveEntity ret = context.createHiveEntity();
         ret.setTypeName(HIVE_TYPE_TABLE);
 

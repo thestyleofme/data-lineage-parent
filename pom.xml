@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.codingdebugallday</groupId>
-    <artifactId>lineage-hook-parent</artifactId>
+    <artifactId>data-lineage-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 

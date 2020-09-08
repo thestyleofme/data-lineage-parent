@@ -183,14 +183,14 @@ public class HiveHookContext {
 
     public Map<String, Object> getQueryInfo() {
         Map<String, Object> ret = new HashMap<>();
-        List<MRTask> mrTasks = getMRTasks();
+        List<MRTask> mrTasks = getMrTasks();
         if (!mrTasks.isEmpty()) {
-            ret.put(HiveEntity.KEY_QUERY_MRTASKS, mrTasks);
+            ret.put(HiveEntity.KEY_QUERY_MR_TASKS, mrTasks);
         }
         return ret;
     }
 
-    public String getQueryID() {
+    public String getQueryId() {
         return hiveContext.getQueryPlan().getQueryId();
     }
 
@@ -214,7 +214,7 @@ public class HiveHookContext {
         return ret;
     }
 
-    public List<MRTask> getMRTasks() {
+    public List<MRTask> getMrTasks() {
         List<MRTask> resVal = new ArrayList<>();
         List<ExecDriver> driverList = Utilities.getMRTasks(hiveContext.getQueryPlan().getRootTasks());
         if ((driverList != null) && !driverList.isEmpty()) {
@@ -246,36 +246,36 @@ public class HiveHookContext {
         Map<String, Object> workInfo = new HashMap<>();
         Statistics workStatistics = mapredWork.getStatistics();
         if (workStatistics != null) {
-            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_AVGROWSIZE, workStatistics.getAvgRowSize());
-            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_DATASIZE, workStatistics.getDataSize());
-            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_NUMROWS, workStatistics.getNumRows());
+            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_AVG_ROW_SIZE, workStatistics.getAvgRowSize());
+            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_DATA_SIZE, workStatistics.getDataSize());
+            setMapKeyValue(workInfo, HiveEntity.KEY_WORK_NUM_ROWS, workStatistics.getNumRows());
         }
         MapWork mapWork = mapredWork.getMapWork();
         if (mapWork != null) {
             Map<String, Object> mapWorkInfo = new HashMap<>();
-            setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_NUMTASKS, mapWork.getNumMapTasks());
+            setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_NUM_TASKS, mapWork.getNumMapTasks());
             Statistics mapStatistics = mapWork.getStatistics();
             if (mapStatistics != null) {
-                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_AVGROWSIZE, mapStatistics.getAvgRowSize());
-                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_DATASIZE, mapStatistics.getDataSize());
-                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_NUMROWS, mapStatistics.getNumRows());
+                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_AVG_ROW_SIZE, mapStatistics.getAvgRowSize());
+                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_DATA_SIZE, mapStatistics.getDataSize());
+                setMapKeyValue(mapWorkInfo, HiveEntity.KEY_WORK_NUM_ROWS, mapStatistics.getNumRows());
             }
             if (!mapWorkInfo.isEmpty()) {
-                workInfo.put(HiveEntity.KEY_MAPWORK_INFO, mapWorkInfo);
+                workInfo.put(HiveEntity.KEY_MAP_WORK_INFO, mapWorkInfo);
             }
         }
         ReduceWork reduceWork = mapredWork.getReduceWork();
         if (reduceWork != null) {
             Map<String, Object> reduceWorkInfo = new HashMap<>();
-            setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_NUMTASKS, reduceWork.getNumReduceTasks());
+            setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_NUM_TASKS, reduceWork.getNumReduceTasks());
             Statistics reduceStatistics = reduceWork.getStatistics();
             if (reduceStatistics != null) {
-                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_AVGROWSIZE, reduceStatistics.getAvgRowSize());
-                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_DATASIZE, reduceStatistics.getDataSize());
-                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_NUMROWS, reduceStatistics.getNumRows());
+                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_AVG_ROW_SIZE, reduceStatistics.getAvgRowSize());
+                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_DATA_SIZE, reduceStatistics.getDataSize());
+                setMapKeyValue(reduceWorkInfo, HiveEntity.KEY_WORK_NUM_ROWS, reduceStatistics.getNumRows());
             }
             if (!reduceWorkInfo.isEmpty()) {
-                workInfo.put(HiveEntity.KEY_REDUCEWORK_INFO, reduceWorkInfo);
+                workInfo.put(HiveEntity.KEY_REDUCE_WORK_INFO, reduceWorkInfo);
             }
         }
         return workInfo;
@@ -304,7 +304,7 @@ public class HiveHookContext {
         ret.setOperationName(getHiveContext().getOperationName());
         ret.setIpAddress(getIpAddress());
         ret.setExecutorAddress(getExecuterAddress());
-        ret.setQueryId(getQueryID());
+        ret.setQueryId(getQueryId());
         ret.setQueryStr(getQueryStr(true));
         ret.setQueryStartTime(getQueryStartTime());
         ret.setQueryInfo(getQueryInfo());

@@ -22,7 +22,7 @@ public class DropTable extends BaseHiveEvent {
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }
