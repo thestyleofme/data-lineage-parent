@@ -205,11 +205,15 @@ public class HiveHookContext {
         }
         String ret;
         try {
-            // 先将空格转码为%20 防止空格变加号
-            String transferQueryStr = queryStr.replace(" ", "%20");
-            ret = URLEncoder.encode(
-                    transferQueryStr,
-                    CharEncoding.UTF_8);
+            // 防止URLEncoder.encode将空格转码为加号
+            String[] splitArray = queryStr.split(" ");
+            ArrayList<String> list = new ArrayList<>();
+            for (String split : splitArray) {
+                list.add(URLEncoder.encode(
+                        split,
+                        CharEncoding.UTF_8));
+            }
+            ret = String.join(" ", list);
         } catch (UnsupportedEncodingException e) {
             ret = hiveContext.getQueryPlan().getQueryStr();
             LOG.error(e.getMessage());

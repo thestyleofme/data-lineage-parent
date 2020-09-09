@@ -60,7 +60,7 @@ public abstract class BaseHiveEvent {
     public static final String ATTRIBUTE_TEMPORARY = "temporary";
     public static final String ATTRIBUTE_RETENTION = "retention";
     public static final String ATTRIBUTE_DB = "db";
-    public static final String ATTRIBUTE_STORAGE_DESC = "sd";
+    public static final String ATTRIBUTE_STORAGE_DESC = "storageDesc";
     public static final String ATTRIBUTE_PARTITION = "partition";
     public static final String ATTRIBUTE_PARTITION_PATHS = "partitionPaths";
     public static final String ATTRIBUTE_PARTITION_VALUES = "partitionValues";

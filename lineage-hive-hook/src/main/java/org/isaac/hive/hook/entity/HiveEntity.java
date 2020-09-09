@@ -95,7 +95,7 @@ public class HiveEntity implements Serializable {
         return (String) entity.get(KEY_CREATED_BY);
     }
 
-    public void setCreatedBy(String createdBy) {//
+    public void setCreatedBy(String createdBy) {
         entity.put(KEY_CREATED_BY, createdBy);
     }
 
@@ -127,8 +127,8 @@ public class HiveEntity implements Serializable {
         return (String) entity.get(KEY_EXECUTOR_ADDRESS);
     }
 
-    public void setExecutorAddress(String executerAddress) {
-        entity.put(KEY_EXECUTOR_ADDRESS, executerAddress);
+    public void setExecutorAddress(String executorAddress) {
+        entity.put(KEY_EXECUTOR_ADDRESS, executorAddress);
     }
 
     public void setQueryId(String queryId) {
