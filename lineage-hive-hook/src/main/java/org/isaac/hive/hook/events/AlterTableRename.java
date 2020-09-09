@@ -26,7 +26,7 @@ public class AlterTableRename extends BaseHiveEvent {
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }

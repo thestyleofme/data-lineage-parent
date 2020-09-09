@@ -20,12 +20,13 @@ import org.isaac.hive.hook.entity.HiveEntity;
  * @since 1.0.0
  */
 public class AlterTableRenameCol extends AlterTable {
+
     public AlterTableRenameCol(HiveHookContext context) {
         super(context);
     }
 
     @Override
-    public String getNotificationMessages() throws Exception {
+    public String getNotificationMessages() throws HiveException {
         HiveEntity entity = getEntity();
         return context.toJson(entity.getResult());
     }
