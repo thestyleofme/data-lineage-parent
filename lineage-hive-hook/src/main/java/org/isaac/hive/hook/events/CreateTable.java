@@ -24,7 +24,6 @@ public class CreateTable extends BaseHiveEvent {
 
     public CreateTable(HiveHookContext context, boolean skipTempTables) {
         super(context);
-
         this.skipTempTables = skipTempTables;
     }
 

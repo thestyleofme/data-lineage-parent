@@ -199,13 +199,16 @@ public class HiveHookContext {
     }
 
     public String getQueryStr(boolean encoding) {
-        String ret;
+        String queryStr = hiveContext.getQueryPlan().getQueryStr().trim();
         if (!encoding) {
-            return hiveContext.getQueryPlan().getQueryStr().trim();
+            return queryStr;
         }
+        String ret;
         try {
+            // 先将空格转码为%20 防止空格变加号
+            String transferQueryStr = queryStr.replace(" ", "%20");
             ret = URLEncoder.encode(
-                    hiveContext.getQueryPlan().getQueryStr().trim(),
+                    transferQueryStr,
                     CharEncoding.UTF_8);
         } catch (UnsupportedEncodingException e) {
             ret = hiveContext.getQueryPlan().getQueryStr();

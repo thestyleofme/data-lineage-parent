@@ -68,6 +68,8 @@ public class HiveEntity implements Serializable {
 
     public HiveEntity() {
         this.entity = new HashMap<>();
+        // kafka里有多个来源 这里标识下是从hive hook发送的 方便后面使用此sourceType进行解析
+        entity.put("sourceType", "HIVE-HOOK");
     }
 
     public Map<String, Object> getResult() {
