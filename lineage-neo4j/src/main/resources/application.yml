@@ -1,0 +1,16 @@
+server:
+  port: 9527
+
+spring:
+  kafka:
+    bootstrap-servers: hdspdemo003:6667
+    listener:
+      concurrency: 4
+    consumer:
+      client-id: neo4j_app
+      max-poll-records: 200
+      auto-offset-reset: earliest
+
+logging:
+  level:
+    org.isaac.lineage: ${LOGGING_LEVEL:debug}

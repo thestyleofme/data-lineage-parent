@@ -1,0 +1,28 @@
+package org.isaac.lineage.neo4j;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * <p>
+ * description
+ * </p>
+ *
+ * @author isaac 2020/9/15 14:14
+ * @since 1.0.0
+ */
+@SpringBootApplication
+public class LineageNeo4jApplication {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LineageNeo4jApplication.class);
+
+    public static void main(String[] args) {
+        try {
+            SpringApplication.run(LineageNeo4jApplication.class, args);
+        } catch (Exception e) {
+            LOGGER.error("application start error", e);
+        }
+    }
+}

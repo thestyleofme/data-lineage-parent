@@ -8,5 +8,5 @@
 
 #### 1.1 lineage-hive-hook
 
-[通过hive hook将血缘信息写入kafka](hooks/lineage-hive-hook/README.md)
+[通过hive hook将血缘信息写入kafka](lineage-hooks/lineage-hive-hook/README.md)
 
