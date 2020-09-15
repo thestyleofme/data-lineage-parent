@@ -312,7 +312,7 @@ public class HiveHookContext {
         ret.setIpAddress(getIpAddress());
         ret.setExecutorAddress(getExecuterAddress());
         ret.setQueryId(getQueryId());
-        ret.setQueryStr(getQueryStr(true));
+        ret.setQueryStr(getQueryStr(false));
         ret.setQueryStartTime(getQueryStartTime());
         ret.setQueryInfo(getQueryInfo());
         return ret;

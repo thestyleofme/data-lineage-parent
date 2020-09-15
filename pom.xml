@@ -17,7 +17,8 @@
     </properties>
 
     <modules>
-        <module>lineage-hive-hook</module>
+        <module>lineage-hooks</module>
+        <module>lineage-neo4j</module>
     </modules>
 
 </project>

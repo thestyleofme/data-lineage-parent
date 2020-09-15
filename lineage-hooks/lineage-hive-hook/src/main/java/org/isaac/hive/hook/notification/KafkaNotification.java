@@ -27,9 +27,7 @@ public class KafkaNotification extends AbstractNotification {
 
     public static final Logger LOG = LoggerFactory.getLogger(KafkaNotification.class);
 
-    public static final String HOOK_TOPIC = "TOPIC-METADATA-LINEAGE";
-    protected static final String CONSUMER_GROUP_ID_PROPERTY = "hive-hook";
-
+    public static final String HOOK_TOPIC = "TOPIC_METADATA_LINEAGE";
     private final Properties properties;
     private KafkaProducer<String, String> producer;
 
