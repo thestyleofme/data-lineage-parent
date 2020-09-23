@@ -5,7 +5,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.exceptions.LineageException;
-import org.isaac.lineage.neo4j.handler.BaseKafkaHandler;
+import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
 import org.springframework.stereotype.Component;
 
 /**

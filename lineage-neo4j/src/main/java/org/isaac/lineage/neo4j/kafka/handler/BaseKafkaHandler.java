@@ -1,4 +1,6 @@
-package org.isaac.lineage.neo4j.handler;
+package org.isaac.lineage.neo4j.kafka.handler;
+
+import org.isaac.lineage.neo4j.domain.LineageMapping;
 
 /**
  * <p>
@@ -14,7 +16,8 @@ public interface BaseKafkaHandler {
      * 处理kafka消息
      *
      * @param record Kafka Message
+     * @return LineageMapping
      */
-    void handle(String record);
+    LineageMapping handle(String record);
 
 }

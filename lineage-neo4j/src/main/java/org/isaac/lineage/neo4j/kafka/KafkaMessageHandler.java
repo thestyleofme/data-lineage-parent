@@ -2,8 +2,9 @@ package org.isaac.lineage.neo4j.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.context.KafkaHandlerContext;
-import org.isaac.lineage.neo4j.handler.BaseKafkaHandler;
-import org.isaac.lineage.neo4j.pojo.KafkaMessage;
+import org.isaac.lineage.neo4j.domain.KafkaMessage;
+import org.isaac.lineage.neo4j.domain.LineageMapping;
+import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -22,9 +23,12 @@ import org.springframework.util.StringUtils;
 public class KafkaMessageHandler {
 
     private final KafkaHandlerContext kafkaHandlerContext;
+    private final LineageExecutor lineageExecutor;
 
-    public KafkaMessageHandler(KafkaHandlerContext kafkaHandlerContext) {
+    public KafkaMessageHandler(KafkaHandlerContext kafkaHandlerContext,
+                               LineageExecutor lineageExecutor) {
         this.kafkaHandlerContext = kafkaHandlerContext;
+        this.lineageExecutor = lineageExecutor;
     }
 
     @KafkaListener(topics = "TOPIC-METADATA-LINEAGE", groupId = "lineage_handler_group")
@@ -39,6 +43,11 @@ public class KafkaMessageHandler {
             return;
         }
         BaseKafkaHandler kafkaHandler = kafkaHandlerContext.getKafkaHandler(sourceType);
-        kafkaHandler.handle(record);
+        LineageMapping lineageMapping = kafkaHandler.handle(record);
+        if (lineageMapping == null) {
+            return;
+        }
+        // neo4j进行血缘储存
+        lineageExecutor.handle(lineageMapping);
     }
 }

@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import org.isaac.lineage.neo4j.exceptions.LineageException;
 import org.springframework.context.ApplicationContext;
@@ -35,6 +36,7 @@ public class JsonUtil {
             // 可以用于单元测试
             OBJECT_MAPPER = new ObjectMapper();
         }
+        OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     public static <T> T toObj(String json, Class<T> clazz) {

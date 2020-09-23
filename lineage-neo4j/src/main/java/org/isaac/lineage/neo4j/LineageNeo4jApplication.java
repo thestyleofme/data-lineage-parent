@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * <p>
@@ -14,6 +17,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 1.0.0
  */
 @SpringBootApplication
+@EnableTransactionManagement
+@EnableNeo4jRepositories(basePackages = {
+        "org.isaac.lineage.neo4j.repository"
+})
+@EntityScan(basePackages = "org.isaac.lineage.neo4j.domain")
 public class LineageNeo4jApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LineageNeo4jApplication.class);

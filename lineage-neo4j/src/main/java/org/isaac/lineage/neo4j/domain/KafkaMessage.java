@@ -1,4 +1,4 @@
-package org.isaac.lineage.neo4j.pojo;
+package org.isaac.lineage.neo4j.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

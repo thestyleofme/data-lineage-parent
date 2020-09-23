@@ -2,7 +2,7 @@ package org.isaac.lineage.neo4j.autoconfiguration;
 
 import org.isaac.lineage.neo4j.annotation.SourceType;
 import org.isaac.lineage.neo4j.context.KafkaHandlerContext;
-import org.isaac.lineage.neo4j.handler.BaseKafkaHandler;
+import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
