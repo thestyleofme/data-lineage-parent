@@ -10,3 +10,6 @@
 
 [通过hive hook将血缘信息写入kafka](lineage-hooks/lineage-hive-hook/README.md)
 
+> hive血缘neo4j示例
+
+![image](doc/images/hive_lineage_demo.png)
