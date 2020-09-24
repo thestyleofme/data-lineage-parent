@@ -73,21 +73,34 @@ public class CreateTableAsHandler {
                                      HiveHookMessage hiveHookMessage,
                                      CreateTableAsEvent createTableAsEvent) {
         ArrayList<TableNode> list = new ArrayList<>();
-        String createTableFrom = null;
+        String inputTable = null;
         for (CreateTableAsEvent.InputsDTO inputsDTO : createTableAsEvent.getInputs()) {
-            createTableFrom = inputsDTO.getName();
+            inputTable = inputsDTO.getName();
             list.add(TableNode.builder()
                     .databaseName(inputsDTO.getDb())
                     .tableName(inputsDTO.getName())
                     .build());
         }
+        String queryStr = hiveHookMessage.getQueryStr().toLowerCase();
         for (CreateTableAsEvent.OutputsDTO outputsDTO : createTableAsEvent.getOutputs()) {
-            list.add(TableNode.builder()
-                    .databaseName(outputsDTO.getDb())
-                    .tableName(outputsDTO.getName())
-                    .sql(hiveHookMessage.getQueryStr())
-                    .createTableFrom(createTableFrom)
-                    .build());
+            if (queryStr.startsWith("create table")) {
+                // create table as select
+                list.add(TableNode.builder()
+                        .databaseName(outputsDTO.getDb())
+                        .tableName(outputsDTO.getName())
+                        .sql(queryStr)
+                        .createTableFrom(inputTable)
+                        .build());
+            } else if (queryStr.startsWith("insert overwrite")) {
+                // insert overwrite
+                list.add(TableNode.builder()
+                        .databaseName(outputsDTO.getDb())
+                        .tableName(outputsDTO.getName())
+                        .insertOverwriteSql(queryStr)
+                        .insertOverwriteFrom(inputTable)
+                        .build());
+            }
+
         }
         lineageMapping.setTableNodeList(list);
     }

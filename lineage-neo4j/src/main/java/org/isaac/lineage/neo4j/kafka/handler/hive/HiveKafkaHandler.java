@@ -26,16 +26,10 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class HiveKafkaHandler implements BaseKafkaHandler {
 
-    private static final String OPERATION_NAME_QUERY = "QUERY";
-
     @Override
     public LineageMapping handle(String record) {
         log.debug("handle HIVE-HOOK message......");
         HiveHookMessage hiveHookMessage = JsonUtil.toObj(record, HiveHookMessage.class);
-        // 查询不做血缘分析
-        if (OPERATION_NAME_QUERY.equals(hiveHookMessage.getOperationName())) {
-            return null;
-        }
         // 解析为 db table field节点
         LineageMapping lineageMapping = new LineageMapping();
         handleNode(lineageMapping, hiveHookMessage);
@@ -58,7 +52,7 @@ public class HiveKafkaHandler implements BaseKafkaHandler {
         if (CollectionUtils.isEmpty(attributes)) {
             return;
         }
-        switch (HiveEventType.valueOf(hiveHookMessage.getTypeName().toUpperCase())){
+        switch (HiveEventType.valueOf(hiveHookMessage.getTypeName().toUpperCase())) {
             case HIVE_TABLE:
                 CreateTableHandler.handle(lineageMapping, hiveHookMessage, attributes);
                 break;

@@ -53,7 +53,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
     void deleteRelationshipWithField();
 
     /**
-     * 创建与table之间的关系
+     * CREATE_TABLE_AS_SELECT
      */
     @Query("MATCH (table1:Table),(table2:Table) " +
             "WHERE table1.platform = table2.platform " +
@@ -61,10 +61,11 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
             "AND table1.databaseName = table2.databaseName " +
             "AND table1.createTableFrom = table2.tableName " +
             "CREATE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
-    void createRelationshipWithTable();
+    void createRelationshipCreateTableAsSelect();
+
 
     /**
-     * 刷新与table之间的关系
+     * CREATE_TABLE_AS_SELECT
      */
     @Query("MATCH (table1:Table)-[r:CREATE_TABLE_AS_SELECT]->(table2:Table) " +
             "WHERE table1.platform = table2.platform " +
@@ -72,5 +73,27 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
             "AND table1.databaseName = table2.databaseName " +
             "AND table1.createTableFrom = table2.tableName " +
             "DELETE r")
-    void deleteRelationshipWithTable();
+    void deleteRelationshipCreateTableAsSelect();
+
+    /**
+     * INSERT_OVERWRITE_TABLE_SELECT
+     */
+    @Query("MATCH (table1:Table),(table2:Table) " +
+            "WHERE table1.platform = table2.platform " +
+            "AND table1.cluster = table2.cluster " +
+            "AND table1.databaseName = table2.databaseName " +
+            "AND table1.insertOverwriteFrom = table2.tableName " +
+            "CREATE (table1)-[:INSERT_OVERWRITE_TABLE_SELECT]->(table2)")
+    void createRelationshipInsertOverwriteTableSelect();
+
+    /**
+     * INSERT_OVERWRITE_TABLE_SELECT
+     */
+    @Query("MATCH (table1:Table)-[r:INSERT_OVERWRITE_TABLE_SELECT]->(table2:Table) " +
+            "WHERE table1.platform = table2.platform " +
+            "AND table1.cluster = table2.cluster " +
+            "AND table1.databaseName = table2.databaseName " +
+            "AND table1.insertOverwriteFrom = table2.tableName " +
+            "DELETE r")
+    void deleteRelationshipInsertOverwriteTableSelect();
 }

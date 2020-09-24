@@ -51,8 +51,11 @@ public class LineageExecutor {
         tableRepository.deleteRelationshipWithField();
         tableRepository.createRelationshipWithField();
         // CREATE_TABLE_AS
-        tableRepository.deleteRelationshipWithTable();
-        tableRepository.createRelationshipWithTable();
+        tableRepository.deleteRelationshipCreateTableAsSelect();
+        tableRepository.createRelationshipCreateTableAsSelect();
+        // INSERT_OVERWRITE_TABLE_SELECT
+        tableRepository.deleteRelationshipInsertOverwriteTableSelect();
+        tableRepository.createRelationshipInsertOverwriteTableSelect();
     }
 
     private void handleDbNode(DatabaseNode databaseNode) {

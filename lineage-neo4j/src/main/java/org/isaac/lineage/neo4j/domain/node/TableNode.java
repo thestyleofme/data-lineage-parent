@@ -42,10 +42,16 @@ public class TableNode {
      */
     private String sql;
     /**
-     * create table as select
-     * 从哪张表来的
+     * create table table1 as select * from table2
+     * createTableFrom: table2
      */
     private String createTableFrom;
+    /**
+     * insert overwrite table1 select * from table2
+     * insertOverwriteFrom: table2
+     */
+    private String insertOverwriteFrom;
+    private String insertOverwriteSql;
 
 
     //===============================================================================
