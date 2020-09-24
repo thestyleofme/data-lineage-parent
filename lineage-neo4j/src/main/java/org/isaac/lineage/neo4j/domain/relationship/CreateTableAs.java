@@ -19,7 +19,7 @@ import org.neo4j.ogm.annotation.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-@RelationshipEntity(type = "CREATE_TABLE_AS")
+@RelationshipEntity(type = "CREATE_TABLE_AS_SELECT")
 public class CreateTableAs {
 
     @Id

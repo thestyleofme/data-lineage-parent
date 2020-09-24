@@ -60,13 +60,13 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
             "AND table1.cluster = table2.cluster " +
             "AND table1.databaseName = table2.databaseName " +
             "AND table1.createTableFrom = table2.tableName " +
-            "CREATE (table1)-[:CREATE_TABLE_AS]->(table2)")
+            "CREATE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
     void createRelationshipWithTable();
 
     /**
      * 刷新与table之间的关系
      */
-    @Query("MATCH (table1:Table)-[r:CREATE_TABLE_AS]->(table2:Table) " +
+    @Query("MATCH (table1:Table)-[r:CREATE_TABLE_AS_SELECT]->(table2:Table) " +
             "WHERE table1.platform = table2.platform " +
             "AND table1.cluster = table2.cluster " +
             "AND table1.databaseName = table2.databaseName " +
