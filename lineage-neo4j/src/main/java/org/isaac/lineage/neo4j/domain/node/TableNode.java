@@ -41,6 +41,11 @@ public class TableNode {
      * 创表语句
      */
     private String sql;
+    /**
+     * create table as select
+     * 从哪张表来的
+     */
+    private String createTableFrom;
 
 
     //===============================================================================

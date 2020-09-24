@@ -17,6 +17,14 @@ import org.springframework.stereotype.Repository;
 public interface FieldRepository extends Neo4jRepository<FieldNode, Long> {
 
     /**
+     * 根据pk判断节点是否存在
+     *
+     * @param pk 主键
+     * @return true/false
+     */
+    boolean existsByPk(String pk);
+
+    /**
      * 给Field节点设置唯一约束
      */
     @Query("CREATE CONSTRAINT ON (f:Field) ASSERT f.pk IS UNIQUE")

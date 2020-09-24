@@ -20,6 +20,14 @@ import org.springframework.stereotype.Repository;
 public interface DatabaseRepository extends Neo4jRepository<DatabaseNode, Long> {
 
     /**
+     * 根据pk判断节点是否存在
+     *
+     * @param pk 主键
+     * @return true/false
+     */
+    boolean existsByPk(String pk);
+
+    /**
      * 给Database节点设置唯一约束
      */
     @Query("CREATE CONSTRAINT ON (db:Database) ASSERT db.pk IS UNIQUE")
@@ -42,9 +50,8 @@ public interface DatabaseRepository extends Neo4jRepository<DatabaseNode, Long> 
             "WHERE table.platform = db.platform " +
             "AND table.cluster = db.cluster " +
             "AND table.databaseName = db.databaseName " +
-            "DELETE r " +
-            "CREATE (table)-[:TABLE_FROM_DATABASE]->(db)")
-    void refreshRelationshipWithTable();
+            "DELETE r")
+    void deleteRelationshipWithTable();
 
     /**
      * 血缘分析查找该库下有哪些表

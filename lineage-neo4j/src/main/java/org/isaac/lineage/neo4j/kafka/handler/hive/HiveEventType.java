@@ -13,7 +13,9 @@ public enum HiveEventType {
     /**
      * CreateTable event
      */
-    HIVE_TABLE("hive_table");
+    HIVE_TABLE("hive_table"),
+    HIVE_PROCESS("hive_process"),
+    ;
 
     private final String name;
 

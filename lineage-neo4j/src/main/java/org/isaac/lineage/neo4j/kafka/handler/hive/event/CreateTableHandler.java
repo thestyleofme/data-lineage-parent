@@ -3,7 +3,6 @@ package org.isaac.lineage.neo4j.kafka.handler.hive.event;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
@@ -12,6 +11,7 @@ import org.isaac.lineage.neo4j.domain.node.TableNode;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveEventType;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
+import org.isaac.lineage.neo4j.utils.LineageUtil;
 
 /**
  * <p>
@@ -40,7 +40,9 @@ public class CreateTableHandler {
         // field
         genFieldNode(lineageMapping, createTableEvent);
         // normal
-        genNormal(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalDbNode(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalTableNode(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalFieldNode(lineageMapping, hiveHookMessage);
     }
 
     private static void genFieldNode(LineageMapping lineageMapping,
@@ -64,48 +66,14 @@ public class CreateTableHandler {
         tableNode.setDatabaseName(createTableEvent.getDb());
         tableNode.setTableName(createTableEvent.getName());
         tableNode.setSql(hiveHookMessage.getQueryStr());
-        // todo extConfig
         lineageMapping.setTableNodeList(Collections.singletonList(tableNode));
     }
 
     private static void genDbNode(LineageMapping lineageMapping, CreateTableEvent createTableEvent) {
         DatabaseNode databaseNode = DatabaseNode.builder().build();
         databaseNode.setDatabaseName(createTableEvent.getDb());
-        lineageMapping.setDatabaseNode(databaseNode);
+        lineageMapping.setDatabaseNodeList(Collections.singletonList(databaseNode));
     }
 
-    private static void genNormal(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
-        String platform = hiveHookMessage.getPlatform();
-        String cluster = hiveHookMessage.getCluster();
-        // db
-        DatabaseNode databaseNode = lineageMapping.getDatabaseNode();
-        Optional.ofNullable(platform).ifPresent(databaseNode::setPlatform);
-        Optional.ofNullable(cluster).ifPresent(databaseNode::setCluster);
-        databaseNode.setPk(String.format(DatabaseNode.PK_FORMAT,
-                databaseNode.getPlatform(),
-                databaseNode.getCluster(),
-                databaseNode.getDatabaseName()));
-        // table
-        lineageMapping.getTableNodeList().forEach(tableNode -> {
-            Optional.ofNullable(platform).ifPresent(tableNode::setPlatform);
-            Optional.ofNullable(cluster).ifPresent(tableNode::setCluster);
-            tableNode.setPk(String.format(TableNode.PK_FORMAT,
-                    tableNode.getPlatform(),
-                    tableNode.getCluster(),
-                    tableNode.getDatabaseName(),
-                    tableNode.getTableName()));
-        });
-        // field
-        lineageMapping.getFieldNodeList().forEach(fieldNode -> {
-            Optional.ofNullable(platform).ifPresent(fieldNode::setPlatform);
-            Optional.ofNullable(cluster).ifPresent(fieldNode::setCluster);
-            fieldNode.setPk(String.format(FieldNode.PK_FORMAT,
-                    fieldNode.getPlatform(),
-                    fieldNode.getCluster(),
-                    fieldNode.getDatabaseName(),
-                    fieldNode.getTableName(),
-                    fieldNode.getFieldName()));
-        });
-    }
 
 }

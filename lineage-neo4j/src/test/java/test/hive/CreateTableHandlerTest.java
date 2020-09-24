@@ -1,4 +1,4 @@
-package test;
+package test.hive;
 
 import org.isaac.lineage.neo4j.LineageNeo4jApplication;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
@@ -21,7 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LineageNeo4jApplication.class)
-public class HiveKafkaHandlerTest {
+public class CreateTableHandlerTest {
 
     @Autowired
     private HiveKafkaHandler hiveKafkaHandler;

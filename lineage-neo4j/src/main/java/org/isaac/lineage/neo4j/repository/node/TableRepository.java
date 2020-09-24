@@ -17,6 +17,14 @@ import org.springframework.stereotype.Repository;
 public interface TableRepository extends Neo4jRepository<TableNode, Long> {
 
     /**
+     * 根据pk判断节点是否存在
+     *
+     * @param pk 主键
+     * @return true/false
+     */
+    boolean existsByPk(String pk);
+
+    /**
      * 给Table节点设置唯一约束
      */
     @Query("CREATE CONSTRAINT ON (table:Table) ASSERT table.pk IS UNIQUE")
@@ -41,7 +49,28 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
             "AND field.cluster = table.cluster " +
             "AND field.databaseName = table.databaseName " +
             "AND field.tableName = table.tableName " +
-            "DELETE r " +
-            "CREATE (field)-[:FIELD_FROM_TABLE]->(table)")
-    void refreshRelationshipWithField();
+            "DELETE r")
+    void deleteRelationshipWithField();
+
+    /**
+     * 创建与table之间的关系
+     */
+    @Query("MATCH (table1:Table),(table2:Table) " +
+            "WHERE table1.platform = table2.platform " +
+            "AND table1.cluster = table2.cluster " +
+            "AND table1.databaseName = table2.databaseName " +
+            "AND table1.createTableFrom = table2.tableName " +
+            "CREATE (table1)-[:CREATE_TABLE_AS]->(table2)")
+    void createRelationshipWithTable();
+
+    /**
+     * 刷新与table之间的关系
+     */
+    @Query("MATCH (table1:Table)-[r:CREATE_TABLE_AS]->(table2:Table) " +
+            "WHERE table1.platform = table2.platform " +
+            "AND table1.cluster = table2.cluster " +
+            "AND table1.databaseName = table2.databaseName " +
+            "AND table1.createTableFrom = table2.tableName " +
+            "DELETE r")
+    void deleteRelationshipWithTable();
 }

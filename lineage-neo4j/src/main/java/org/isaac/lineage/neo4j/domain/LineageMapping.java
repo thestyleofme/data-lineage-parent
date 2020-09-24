@@ -26,7 +26,7 @@ import org.isaac.lineage.neo4j.domain.node.TableNode;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineageMapping {
 
-    private DatabaseNode databaseNode;
+    private List<DatabaseNode> databaseNodeList;
     private List<TableNode> tableNodeList;
     private List<FieldNode> fieldNodeList;
 }

@@ -1,6 +1,6 @@
 package org.isaac.lineage.neo4j.kafka;
 
-import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
@@ -44,29 +44,48 @@ public class LineageExecutor {
     }
 
     private void createRelationship() {
+        // TABLE_FROM_DATABASE
+        databaseRepository.deleteRelationshipWithTable();
         databaseRepository.createRelationshipWithTable();
-        databaseRepository.refreshRelationshipWithTable();
+        // FIELD_FROM_TABLE
+        tableRepository.deleteRelationshipWithField();
         tableRepository.createRelationshipWithField();
-        tableRepository.refreshRelationshipWithField();
+        // CREATE_TABLE_AS
+        tableRepository.deleteRelationshipWithTable();
+        tableRepository.createRelationshipWithTable();
+    }
+
+    private void handleDbNode(DatabaseNode databaseNode) {
+        if (!databaseRepository.existsByPk(databaseNode.getPk())) {
+            databaseRepository.save(databaseNode);
+            databaseRepository.createConstraint();
+        }
+    }
+
+    private void handleTableNode(TableNode tableNode) {
+        if (!tableRepository.existsByPk(tableNode.getPk())) {
+            tableRepository.save(tableNode);
+            tableRepository.createConstraint();
+        }
+    }
+
+    private void handleFieldNode(FieldNode fieldNode) {
+        if (!fieldRepository.existsByPk(fieldNode.getPk())) {
+            fieldRepository.save(fieldNode);
+            fieldRepository.createConstraint();
+        }
     }
 
     private void createNode(LineageMapping lineageMapping) {
         // db
-        DatabaseNode databaseNode = lineageMapping.getDatabaseNode();
-        databaseRepository.save(databaseNode);
-        databaseRepository.createConstraint();
+        Optional.ofNullable(lineageMapping.getDatabaseNodeList())
+                .ifPresent(databaseNodes -> databaseNodes.forEach(this::handleDbNode));
         // table
-        List<TableNode> tableNodeList = lineageMapping.getTableNodeList();
-        tableNodeList.forEach(tableNode -> {
-            tableRepository.save(tableNode);
-            tableRepository.createConstraint();
-        });
+        Optional.ofNullable(lineageMapping.getTableNodeList())
+                .ifPresent(tableNodes -> tableNodes.forEach(this::handleTableNode));
         // field
-        List<FieldNode> fieldNodeList = lineageMapping.getFieldNodeList();
-        fieldNodeList.forEach(fieldNode -> {
-            fieldRepository.save(fieldNode);
-            fieldRepository.createConstraint();
-        });
+        Optional.ofNullable(lineageMapping.getFieldNodeList())
+                .ifPresent(fieldNodes -> fieldNodes.forEach(this::handleFieldNode));
     }
 
 }
