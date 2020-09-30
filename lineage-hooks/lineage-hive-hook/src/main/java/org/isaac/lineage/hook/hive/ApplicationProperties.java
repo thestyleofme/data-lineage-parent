@@ -2,8 +2,6 @@ package org.isaac.lineage.hook.hive;
 
 import java.io.File;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import org.apache.commons.configuration2.Configuration;
@@ -12,6 +10,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.isaac.lineage.hook.hive.exceptions.HiveHookException;
+import org.isaac.lineage.hook.hive.utils.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,7 @@ public final class ApplicationProperties extends PropertiesConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationProperties.class);
 
-    public static final String APPLICATION_PROPERTIES = "kafka-application.properties";
+    public static final String APPLICATION_PROPERTIES = "kafka.properties";
 
     private static volatile Configuration instance = null;
 
@@ -58,7 +57,7 @@ public final class ApplicationProperties extends PropertiesConfiguration {
 
     public static Configuration get(String fileName) {
         // get from jar path
-        String confLocation = getProjectPath();
+        String confLocation = PathUtils.getProjectPath();
         try {
             URL url;
             File file = new File(confLocation, fileName);
@@ -95,25 +94,5 @@ public final class ApplicationProperties extends PropertiesConfiguration {
                 LOG.debug("{} = {}", key, configuration.getProperty(key));
             }
         }
-    }
-
-    private static String getProjectPath() {
-        String filePath = null;
-        try {
-            URL url = ApplicationProperties.class.getProtectionDomain().getCodeSource().getLocation();
-            if (url != null) {
-                filePath = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
-                filePath = filePath.replace("\\", "/");
-                if (filePath.endsWith(".jar")) {
-                    filePath = filePath.substring(0, filePath.lastIndexOf("/") + 1);
-                }
-                File file = new File(filePath);
-                filePath = file.getAbsolutePath();
-            }
-        } catch (Exception e) {
-            // ignore
-            filePath = null;
-        }
-        return filePath;
     }
 }

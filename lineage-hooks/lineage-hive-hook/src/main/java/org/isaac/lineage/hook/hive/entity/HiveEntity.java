@@ -1,7 +1,8 @@
 package org.isaac.lineage.hook.hive.entity;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.isaac.lineage.hook.hive.exceptions.HiveHookException;
+import org.isaac.lineage.hook.hive.utils.PathUtils;
 
 /**
  * <p>
@@ -72,28 +74,43 @@ public class HiveEntity implements Serializable {
     private final transient Map<String, Object> entity;
     private transient Map<String, Object> attributes;
 
+    private static volatile Properties hiveHookProperties;
+
+    public static void get() {
+        if (hiveHookProperties == null) {
+            synchronized (HiveEntity.class) {
+                if (hiveHookProperties == null) {
+                    hiveHookProperties = readHiveHookProperties();
+                }
+            }
+        }
+    }
+
     public HiveEntity() {
         this.entity = new HashMap<>();
         // kafka里有多个来源 这里标识下是从hive hook发送的 方便后面使用此sourceType进行解析
         entity.put("sourceType", "HIVE-HOOK");
         // 读取文件放入额外信息到hook中 主要是做系统以及集群血缘
-        readHiveHookExtra(entity);
+        get();
+        Set<Map.Entry<Object, Object>> entries = hiveHookProperties.entrySet();
+        for (Map.Entry<Object, Object> entry : entries) {
+            entity.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
     }
 
     /**
-     * hive-hook.properties
+     * hook.properties
      * clusterName=DEFAULT
      * platformName=DEFAULT
      */
-    private void readHiveHookExtra(Map<String, Object> entity) {
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("hive-hook.properties");
+    private static Properties readHiveHookProperties() {
         Properties properties = new Properties();
         try {
-            properties.load(inputStream);
-            Set<Map.Entry<Object, Object>> entries = properties.entrySet();
-            for (Map.Entry<Object, Object> entry : entries) {
-                entity.put(String.valueOf(entry.getKey()), entry.getValue());
-            }
+            String confLocation = PathUtils.getProjectPath();
+            File file = new File(confLocation, "hook.properties");
+            FileInputStream fileInputStream = new FileInputStream(file);
+            properties.load(fileInputStream);
+            return properties;
         } catch (IOException e) {
             throw new HiveHookException(e);
         }

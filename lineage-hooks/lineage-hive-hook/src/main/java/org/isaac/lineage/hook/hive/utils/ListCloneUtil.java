@@ -17,6 +17,9 @@ import org.isaac.lineage.hook.hive.lineage.bean.ColumnLineage;
  */
 public final class ListCloneUtil {
 
+    private ListCloneUtil(){
+    }
+
     public static ColumnLineage cloneColLine(ColumnLineage col) {
         return new ColumnLineage(
                 col.getToNameParse(),
