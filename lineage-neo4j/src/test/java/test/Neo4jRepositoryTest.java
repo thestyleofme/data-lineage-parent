@@ -3,9 +3,9 @@ package test;
 import java.util.List;
 
 import org.isaac.lineage.neo4j.LineageNeo4jApplication;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
-import org.isaac.lineage.neo4j.domain.result.DbQueryResult;
-import org.isaac.lineage.neo4j.repository.node.DatabaseRepository;
+import org.isaac.lineage.neo4j.domain.node.SchemaNode;
+import org.isaac.lineage.neo4j.domain.result.SchemaQueryResult;
+import org.isaac.lineage.neo4j.repository.node.SchemaRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +26,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class Neo4jRepositoryTest {
 
     @Autowired
-    private DatabaseRepository databaseRepository;
+    private SchemaRepository schemaRepository;
 
     @Test
     public void testQuery() {
-        List<DatabaseNode> all = (List<DatabaseNode>) databaseRepository.findAll();
-        List<DbQueryResult> queryResults = databaseRepository.queryTables("test");
+        List<SchemaNode> all = (List<SchemaNode>) schemaRepository.findAll();
+        List<SchemaQueryResult> queryResults = schemaRepository.queryTables("test");
         Assert.assertNotNull(all);
     }
 }

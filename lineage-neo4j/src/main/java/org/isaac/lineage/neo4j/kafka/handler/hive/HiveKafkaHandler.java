@@ -30,7 +30,7 @@ public class HiveKafkaHandler implements BaseKafkaHandler {
     public LineageMapping handle(String record) {
         log.debug("handle HIVE-HOOK message......");
         HiveHookMessage hiveHookMessage = JsonUtil.toObj(record, HiveHookMessage.class);
-        // 解析为 db table field节点
+        // 解析为 platform cluster schema table field节点
         LineageMapping lineageMapping = new LineageMapping();
         handleNode(lineageMapping, hiveHookMessage);
         return lineageMapping;
@@ -43,7 +43,6 @@ public class HiveKafkaHandler implements BaseKafkaHandler {
      * @param hiveHookMessage HiveHookMessage
      */
     private void handleNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
-        // 生成database table field节点
         generateLineageNode(lineageMapping, hiveHookMessage);
     }
 

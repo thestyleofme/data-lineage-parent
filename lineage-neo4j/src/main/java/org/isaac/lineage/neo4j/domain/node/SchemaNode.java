@@ -6,10 +6,10 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * <p>
- * Table Node
+ * Schema Node, if database contain catalog,use database = catalog.schema
  * </p>
  *
- * @author isaac 2020/09/28
+ * @author JupiterMouse 2020/09/28
  * @since 1.0
  */
 @EqualsAndHashCode(callSuper = true)
@@ -17,30 +17,17 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@NodeEntity(NeoConstant.Type.NODE_TABLE)
-public class TableNode extends BaseNodeEntity {
+@NodeEntity(NeoConstant.Type.NODE_SCHEMA)
+public class SchemaNode extends BaseNodeEntity {
 
     private String schemaName;
-    private String tableName;
 
     //===============================================================================
     //  Other information fields
     //===============================================================================
 
     /**
-     * 创表语句
+     * 创建database的sql
      */
     private String sql;
-    /**
-     * create table table1 as select * from table2
-     * createTableFrom: table2
-     */
-    private String createTableFrom;
-    /**
-     * insert overwrite table1 select * from table2
-     * insertOverwriteFrom: table2
-     */
-    private String insertOverwriteFrom;
-    private String insertOverwriteSql;
 }
-

@@ -7,9 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
-import org.isaac.lineage.neo4j.domain.node.FieldNode;
-import org.isaac.lineage.neo4j.domain.node.TableNode;
+import org.isaac.lineage.neo4j.domain.node.*;
 
 /**
  * <p>
@@ -26,7 +24,9 @@ import org.isaac.lineage.neo4j.domain.node.TableNode;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineageMapping {
 
-    private List<DatabaseNode> databaseNodeList;
+    private List<PlatformNode> platformNodeList;
+    private List<ClusterNode> clusterNodeList;
+    private List<SchemaNode> schemaNodeList;
     private List<TableNode> tableNodeList;
     private List<FieldNode> fieldNodeList;
 }

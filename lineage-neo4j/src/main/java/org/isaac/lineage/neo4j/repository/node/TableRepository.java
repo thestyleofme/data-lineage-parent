@@ -14,40 +14,26 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface TableRepository extends Neo4jRepository<TableNode, Long> {
+public interface TableRepository extends Neo4jRepository<TableNode, String> {
 
     /**
-     * 根据pk判断节点是否存在
-     *
-     * @param pk 主键
-     * @return true/false
-     */
-    boolean existsByPk(String pk);
-
-    /**
-     * 给Table节点设置唯一约束
-     */
-    @Query("CREATE CONSTRAINT ON (table:Table) ASSERT table.pk IS UNIQUE")
-    void createConstraint();
-
-    /**
-     * 创建与field之间的关系
+     * FIELD_FROM_TABLE
      */
     @Query("MATCH (field:Field),(table:Table) " +
-            "WHERE field.platform = table.platform " +
-            "AND field.cluster = table.cluster " +
-            "AND field.databaseName = table.databaseName " +
+            "WHERE field.platformName = table.platformName " +
+            "AND field.clusterName = table.clusterName " +
+            "AND field.schemaName = table.schemaName " +
             "AND field.tableName = table.tableName " +
             "CREATE (field)-[:FIELD_FROM_TABLE]->(table)")
     void createRelationshipWithField();
 
     /**
-     * 刷新与field之间的关系
+     * FIELD_FROM_TABLE
      */
     @Query("MATCH (field:Field)-[r:FIELD_FROM_TABLE]->(table:Table) " +
-            "WHERE field.platform = table.platform " +
-            "AND field.cluster = table.cluster " +
-            "AND field.databaseName = table.databaseName " +
+            "WHERE field.platformName = table.platformName " +
+            "AND field.clusterName = table.clusterName " +
+            "AND field.schemaName = table.schemaName " +
             "AND field.tableName = table.tableName " +
             "DELETE r")
     void deleteRelationshipWithField();
@@ -56,22 +42,21 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
      * CREATE_TABLE_AS_SELECT
      */
     @Query("MATCH (table1:Table),(table2:Table) " +
-            "WHERE table1.platform = table2.platform " +
-            "AND table1.cluster = table2.cluster " +
-            "AND table1.databaseName = table2.databaseName " +
-            "AND table1.createTableFrom = table2.tableName " +
+            "WHERE table1.platformName = table2.platformName " +
+            "AND table1.clusterName = table2.clusterName " +
+            "AND table1.schemaName = table2.schemaName " +
+            "AND table1.createTableFrom = table2.pk " +
             "CREATE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
     void createRelationshipCreateTableAsSelect();
-
 
     /**
      * CREATE_TABLE_AS_SELECT
      */
     @Query("MATCH (table1:Table)-[r:CREATE_TABLE_AS_SELECT]->(table2:Table) " +
-            "WHERE table1.platform = table2.platform " +
-            "AND table1.cluster = table2.cluster " +
-            "AND table1.databaseName = table2.databaseName " +
-            "AND table1.createTableFrom = table2.tableName " +
+            "WHERE table1.platformName = table2.platformName " +
+            "AND table1.clusterName = table2.clusterName " +
+            "AND table1.schemaName = table2.schemaName " +
+            "AND table1.createTableFrom = table2.pk " +
             "DELETE r")
     void deleteRelationshipCreateTableAsSelect();
 
@@ -79,10 +64,10 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
      * INSERT_OVERWRITE_TABLE_SELECT
      */
     @Query("MATCH (table1:Table),(table2:Table) " +
-            "WHERE table1.platform = table2.platform " +
-            "AND table1.cluster = table2.cluster " +
-            "AND table1.databaseName = table2.databaseName " +
-            "AND table1.insertOverwriteFrom = table2.tableName " +
+            "WHERE table1.platformName = table2.platformName " +
+            "AND table1.clusterName = table2.clusterName " +
+            "AND table1.schemaName = table2.schemaName " +
+            "AND table1.insertOverwriteFrom = table2.pk " +
             "CREATE (table1)-[:INSERT_OVERWRITE_TABLE_SELECT]->(table2)")
     void createRelationshipInsertOverwriteTableSelect();
 
@@ -90,10 +75,10 @@ public interface TableRepository extends Neo4jRepository<TableNode, Long> {
      * INSERT_OVERWRITE_TABLE_SELECT
      */
     @Query("MATCH (table1:Table)-[r:INSERT_OVERWRITE_TABLE_SELECT]->(table2:Table) " +
-            "WHERE table1.platform = table2.platform " +
-            "AND table1.cluster = table2.cluster " +
-            "AND table1.databaseName = table2.databaseName " +
-            "AND table1.insertOverwriteFrom = table2.tableName " +
+            "WHERE table1.platformName = table2.platformName " +
+            "AND table1.clusterName = table2.clusterName " +
+            "AND table1.schemaName = table2.schemaName " +
+            "AND table1.insertOverwriteFrom = table2.pk " +
             "DELETE r")
     void deleteRelationshipInsertOverwriteTableSelect();
 }

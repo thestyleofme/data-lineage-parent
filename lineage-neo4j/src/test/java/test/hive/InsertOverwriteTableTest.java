@@ -30,6 +30,7 @@ public class InsertOverwriteTableTest {
 
     @Test
     public void test() {
+        // language=JSON
         String record = "{\n" +
                 "    \"queryStartTime\": 1600864825903,\n" +
                 "    \"sourceType\": \"HIVE-HOOK\",\n" +

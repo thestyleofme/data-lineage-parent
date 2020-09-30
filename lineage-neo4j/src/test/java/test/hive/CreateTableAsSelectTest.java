@@ -30,6 +30,7 @@ public class CreateTableAsSelectTest {
 
     @Test
     public void test() {
+        // language=JSON
         String record = "{\n" +
                 "    \"queryStartTime\": 1600864931235,\n" +
                 "    \"sourceType\": \"HIVE-HOOK\",\n" +

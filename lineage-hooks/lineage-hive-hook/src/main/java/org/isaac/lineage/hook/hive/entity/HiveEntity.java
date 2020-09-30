@@ -1,8 +1,14 @@
 package org.isaac.lineage.hook.hive.entity;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.isaac.lineage.hook.hive.exceptions.HiveHookException;
 
 /**
  * <p>
@@ -70,6 +76,27 @@ public class HiveEntity implements Serializable {
         this.entity = new HashMap<>();
         // kafka里有多个来源 这里标识下是从hive hook发送的 方便后面使用此sourceType进行解析
         entity.put("sourceType", "HIVE-HOOK");
+        // 读取文件放入额外信息到hook中 主要是做系统以及集群血缘
+        readHiveHookExtra(entity);
+    }
+
+    /**
+     * hive-hook.properties
+     * clusterName=DEFAULT
+     * platformName=DEFAULT
+     */
+    private void readHiveHookExtra(Map<String, Object> entity) {
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("hive-hook.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+            Set<Map.Entry<Object, Object>> entries = properties.entrySet();
+            for (Map.Entry<Object, Object> entry : entries) {
+                entity.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+        } catch (IOException e) {
+            throw new HiveHookException(e);
+        }
     }
 
     public Map<String, Object> getResult() {

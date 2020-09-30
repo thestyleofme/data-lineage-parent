@@ -2,11 +2,13 @@ package org.isaac.lineage.neo4j.kafka.handler.hive.event;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
+import org.isaac.lineage.neo4j.domain.NodeQualifiedName;
 import org.isaac.lineage.neo4j.domain.node.FieldNode;
+import org.isaac.lineage.neo4j.domain.node.SchemaNode;
 import org.isaac.lineage.neo4j.domain.node.TableNode;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
@@ -31,31 +33,92 @@ public class CreateTableAsHandler {
                               HiveHookMessage hiveHookMessage,
                               Map<String, Object> attributes) {
         CreateTableAsEvent createTableAsEvent = JsonUtil.toObj(JsonUtil.toJson(attributes), CreateTableAsEvent.class);
+        // 生成node信息
+        doCreateNode(lineageMapping, hiveHookMessage, createTableAsEvent);
+        // node的冗余字段处理
+        LineageUtil.doNodeNormal(lineageMapping, hiveHookMessage);
+    }
+
+    private static void doCreateNode(LineageMapping lineageMapping,
+                                     HiveHookMessage hiveHookMessage,
+                                     CreateTableAsEvent createTableAsEvent) {
+        // platform cluster
+        LineageUtil.genHivePlatformAndClusterNode(lineageMapping, hiveHookMessage);
         // db
-        genDbNode(lineageMapping, createTableAsEvent);
+        genSchemaNode(lineageMapping, createTableAsEvent);
         // table
         genTableNode(lineageMapping, hiveHookMessage, createTableAsEvent);
         // field
         genFieldNode(lineageMapping, createTableAsEvent);
-        // normal
-        LineageUtil.genNormalDbNode(lineageMapping, hiveHookMessage);
-        LineageUtil.genNormalTableNode(lineageMapping, hiveHookMessage);
-        LineageUtil.genNormalFieldNode(lineageMapping, hiveHookMessage);
     }
 
-    private static void genFieldNode(LineageMapping lineageMapping, CreateTableAsEvent createTableAsEvent) {
+    private static void genSchemaNode(LineageMapping lineageMapping,
+                                      CreateTableAsEvent createTableAsEvent) {
+        ArrayList<SchemaNode> list = new ArrayList<>();
+        createTableAsEvent.getInputs().forEach(inputsDTO ->
+                list.add(SchemaNode.builder().schemaName(inputsDTO.getDb()).build())
+        );
+        createTableAsEvent.getOutputs().forEach(outputsDTO ->
+                list.add(SchemaNode.builder().schemaName(outputsDTO.getDb()).build())
+        );
+        lineageMapping.setSchemaNodeList(list);
+    }
+
+    private static void genTableNode(LineageMapping lineageMapping,
+                                     HiveHookMessage hiveHookMessage,
+                                     CreateTableAsEvent createTableAsEvent) {
+        ArrayList<TableNode> list = new ArrayList<>();
+        String inputTable = null;
+        String schema = null;
+        for (CreateTableAsEvent.InputsDTO inputsDTO : createTableAsEvent.getInputs()) {
+            inputTable = inputsDTO.getName();
+            schema = inputsDTO.getDb();
+            list.add(TableNode.builder()
+                    .schemaName(schema)
+                    .tableName(inputTable)
+                    .build());
+        }
+        String queryStr = hiveHookMessage.getQueryStr().toLowerCase();
+        String inputTablePk = NodeQualifiedName.ofTable(hiveHookMessage.getPlatformName(),
+                hiveHookMessage.getClusterName(),
+                Objects.requireNonNull(schema),
+                inputTable).toString();
+        for (CreateTableAsEvent.OutputsDTO outputsDTO : createTableAsEvent.getOutputs()) {
+            if (queryStr.startsWith("create table")) {
+                // create table as select
+                list.add(TableNode.builder()
+                        .schemaName(outputsDTO.getDb())
+                        .tableName(outputsDTO.getName())
+                        .sql(queryStr)
+                        .createTableFrom(inputTablePk)
+                        .build());
+            } else if (queryStr.startsWith("insert overwrite")) {
+                // insert overwrite
+                list.add(TableNode.builder()
+                        .schemaName(outputsDTO.getDb())
+                        .tableName(outputsDTO.getName())
+                        .insertOverwriteSql(queryStr)
+                        .insertOverwriteFrom(inputTablePk)
+                        .build());
+            }
+        }
+        lineageMapping.setTableNodeList(list);
+    }
+
+    private static void genFieldNode(LineageMapping lineageMapping,
+                                     CreateTableAsEvent createTableAsEvent) {
         ArrayList<FieldNode> list = new ArrayList<>();
         createTableAsEvent.getOutputs().forEach(outputsDTO ->
                 outputsDTO.getColumns().forEach(columnsDTO -> {
                     FieldNode fieldNode = genColumn(columnsDTO);
-                    fieldNode.setDatabaseName(outputsDTO.getDb());
+                    fieldNode.setSchemaName(outputsDTO.getDb());
                     fieldNode.setTableName(outputsDTO.getName());
                     list.add(fieldNode);
                 }));
         createTableAsEvent.getInputs().forEach(inputsDTO ->
                 inputsDTO.getColumns().forEach(columnsDTO -> {
                     FieldNode fieldNode = genColumn(columnsDTO);
-                    fieldNode.setDatabaseName(inputsDTO.getDb());
+                    fieldNode.setSchemaName(inputsDTO.getDb());
                     fieldNode.setTableName(inputsDTO.getName());
                     list.add(fieldNode);
                 }));
@@ -67,53 +130,6 @@ public class CreateTableAsHandler {
                 .fieldName(columnsDTO.getName())
                 .fieldType(columnsDTO.getType())
                 .build();
-    }
-
-    private static void genTableNode(LineageMapping lineageMapping,
-                                     HiveHookMessage hiveHookMessage,
-                                     CreateTableAsEvent createTableAsEvent) {
-        ArrayList<TableNode> list = new ArrayList<>();
-        String inputTable = null;
-        for (CreateTableAsEvent.InputsDTO inputsDTO : createTableAsEvent.getInputs()) {
-            inputTable = inputsDTO.getName();
-            list.add(TableNode.builder()
-                    .databaseName(inputsDTO.getDb())
-                    .tableName(inputsDTO.getName())
-                    .build());
-        }
-        String queryStr = hiveHookMessage.getQueryStr().toLowerCase();
-        for (CreateTableAsEvent.OutputsDTO outputsDTO : createTableAsEvent.getOutputs()) {
-            if (queryStr.startsWith("create table")) {
-                // create table as select
-                list.add(TableNode.builder()
-                        .databaseName(outputsDTO.getDb())
-                        .tableName(outputsDTO.getName())
-                        .sql(queryStr)
-                        .createTableFrom(inputTable)
-                        .build());
-            } else if (queryStr.startsWith("insert overwrite")) {
-                // insert overwrite
-                list.add(TableNode.builder()
-                        .databaseName(outputsDTO.getDb())
-                        .tableName(outputsDTO.getName())
-                        .insertOverwriteSql(queryStr)
-                        .insertOverwriteFrom(inputTable)
-                        .build());
-            }
-
-        }
-        lineageMapping.setTableNodeList(list);
-    }
-
-    private static void genDbNode(LineageMapping lineageMapping, CreateTableAsEvent createTableAsEvent) {
-        ArrayList<DatabaseNode> list = new ArrayList<>();
-        createTableAsEvent.getInputs().forEach(inputsDTO ->
-                list.add(DatabaseNode.builder().databaseName(inputsDTO.getDb()).build())
-        );
-        createTableAsEvent.getOutputs().forEach(outputsDTO ->
-                list.add(DatabaseNode.builder().databaseName(outputsDTO.getDb()).build())
-        );
-        lineageMapping.setDatabaseNodeList(list);
     }
 
 }

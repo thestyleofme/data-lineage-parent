@@ -22,5 +22,5 @@ public class NotificationProvider {
         }
         return kafkaNotification;
     }
-    
+
 }

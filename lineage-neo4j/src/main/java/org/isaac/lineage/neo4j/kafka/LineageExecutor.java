@@ -4,12 +4,8 @@ import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
-import org.isaac.lineage.neo4j.domain.node.FieldNode;
-import org.isaac.lineage.neo4j.domain.node.TableNode;
-import org.isaac.lineage.neo4j.repository.node.DatabaseRepository;
-import org.isaac.lineage.neo4j.repository.node.FieldRepository;
-import org.isaac.lineage.neo4j.repository.node.TableRepository;
+import org.isaac.lineage.neo4j.domain.node.*;
+import org.isaac.lineage.neo4j.repository.node.*;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,14 +20,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LineageExecutor {
 
-    private final DatabaseRepository databaseRepository;
+    private final PlatformRepository platformRepository;
+    private final ClusterRepository clusterRepository;
+    private final SchemaRepository schemaRepository;
     private final TableRepository tableRepository;
     private final FieldRepository fieldRepository;
 
-    public LineageExecutor(DatabaseRepository databaseRepository,
+    public LineageExecutor(PlatformRepository platformRepository,
+                           ClusterRepository clusterRepository,
+                           SchemaRepository schemaRepository,
                            TableRepository tableRepository,
                            FieldRepository fieldRepository) {
-        this.databaseRepository = databaseRepository;
+        this.platformRepository = platformRepository;
+        this.clusterRepository = clusterRepository;
+        this.schemaRepository = schemaRepository;
         this.tableRepository = tableRepository;
         this.fieldRepository = fieldRepository;
     }
@@ -43,52 +45,63 @@ public class LineageExecutor {
         createRelationship();
     }
 
-    private void createRelationship() {
-        // TABLE_FROM_DATABASE
-        databaseRepository.deleteRelationshipWithTable();
-        databaseRepository.createRelationshipWithTable();
-        // FIELD_FROM_TABLE
-        tableRepository.deleteRelationshipWithField();
-        tableRepository.createRelationshipWithField();
-        // CREATE_TABLE_AS
-        tableRepository.deleteRelationshipCreateTableAsSelect();
-        tableRepository.createRelationshipCreateTableAsSelect();
-        // INSERT_OVERWRITE_TABLE_SELECT
-        tableRepository.deleteRelationshipInsertOverwriteTableSelect();
-        tableRepository.createRelationshipInsertOverwriteTableSelect();
-    }
-
-    private void handleDbNode(DatabaseNode databaseNode) {
-        if (!databaseRepository.existsByPk(databaseNode.getPk())) {
-            databaseRepository.save(databaseNode);
-            databaseRepository.createConstraint();
-        }
-    }
-
-    private void handleTableNode(TableNode tableNode) {
-        if (!tableRepository.existsByPk(tableNode.getPk())) {
-            tableRepository.save(tableNode);
-            tableRepository.createConstraint();
-        }
-    }
-
-    private void handleFieldNode(FieldNode fieldNode) {
-        if (!fieldRepository.existsByPk(fieldNode.getPk())) {
-            fieldRepository.save(fieldNode);
-            fieldRepository.createConstraint();
-        }
-    }
-
     private void createNode(LineageMapping lineageMapping) {
-        // db
-        Optional.ofNullable(lineageMapping.getDatabaseNodeList())
-                .ifPresent(databaseNodes -> databaseNodes.forEach(this::handleDbNode));
+        // platform
+        Optional.ofNullable(lineageMapping.getPlatformNodeList())
+                .ifPresent(platformNodes -> platformNodes.forEach(this::handlePlatformNode));
+        // cluster
+        Optional.ofNullable(lineageMapping.getClusterNodeList())
+                .ifPresent(clusterNodes -> clusterNodes.forEach(this::handleClusterNode));
+        // schema
+        Optional.ofNullable(lineageMapping.getSchemaNodeList())
+                .ifPresent(schemaNodes -> schemaNodes.forEach(this::handleSchemaNode));
         // table
         Optional.ofNullable(lineageMapping.getTableNodeList())
                 .ifPresent(tableNodes -> tableNodes.forEach(this::handleTableNode));
         // field
         Optional.ofNullable(lineageMapping.getFieldNodeList())
                 .ifPresent(fieldNodes -> fieldNodes.forEach(this::handleFieldNode));
+    }
+
+    private void handlePlatformNode(PlatformNode platformNode) {
+        platformRepository.save(platformNode);
+    }
+
+    private void handleClusterNode(ClusterNode clusterNode) {
+        clusterRepository.save(clusterNode);
+    }
+
+    private void handleSchemaNode(SchemaNode schemaNode) {
+        schemaRepository.save(schemaNode);
+    }
+
+    private void handleTableNode(TableNode tableNode) {
+        tableRepository.save(tableNode);
+    }
+
+    private void handleFieldNode(FieldNode fieldNode) {
+        fieldRepository.save(fieldNode);
+    }
+
+    private void createRelationship() {
+        // CLUSTER_FROM_PLATFORM
+        platformRepository.deleteRelationshipWithCluster();
+        platformRepository.createRelationshipWithCluster();
+        // SCHEMA_FROM_CLUSTER
+        clusterRepository.deleteRelationshipWithSchema();
+        clusterRepository.createRelationshipWithSchema();
+        // TABLE_FROM_SCHEMA
+        schemaRepository.deleteRelationshipWithTable();
+        schemaRepository.createRelationshipWithTable();
+        // FIELD_FROM_TABLE
+        tableRepository.deleteRelationshipWithField();
+        tableRepository.createRelationshipWithField();
+        // CREATE_TABLE_AS_SELECT
+        tableRepository.deleteRelationshipCreateTableAsSelect();
+        tableRepository.createRelationshipCreateTableAsSelect();
+        // INSERT_OVERWRITE_TABLE_SELECT
+        tableRepository.deleteRelationshipInsertOverwriteTableSelect();
+        tableRepository.createRelationshipInsertOverwriteTableSelect();
     }
 
 }

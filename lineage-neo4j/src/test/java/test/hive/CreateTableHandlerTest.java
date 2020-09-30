@@ -30,6 +30,7 @@ public class CreateTableHandlerTest {
 
     @Test
     public void test() {
+        // language=JSON
         String record = "{\n" +
                 "\t\"queryStartTime\": 1599631938701,\n" +
                 "\t\"sourceType\": \"HIVE-HOOK\",\n" +

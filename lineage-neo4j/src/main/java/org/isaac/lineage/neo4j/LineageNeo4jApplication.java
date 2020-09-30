@@ -1,5 +1,6 @@
 package org.isaac.lineage.neo4j;
 
+import org.isaac.lineage.neo4j.repository.SimpleJpaRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -18,9 +19,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement
-@EnableNeo4jRepositories(basePackages = {
-        "org.isaac.lineage.neo4j.repository"
-})
+@EnableNeo4jRepositories(basePackages = {"org.isaac.lineage.neo4j.repository.node"},
+        repositoryBaseClass = SimpleJpaRepositoryImpl.class)
 @EntityScan(basePackages = "org.isaac.lineage.neo4j.domain")
 public class LineageNeo4jApplication {
 

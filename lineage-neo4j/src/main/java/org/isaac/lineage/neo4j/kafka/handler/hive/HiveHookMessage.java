@@ -39,7 +39,7 @@ public class HiveHookMessage {
     //  normal
     //===============================================================================
 
-    private String platform;
-    private String cluster;
+    private String platformName;
+    private String clusterName;
 
 }

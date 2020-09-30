@@ -15,6 +15,7 @@ spring:
       uri: bolt://172.23.16.66:7687
       username: neo4j
       password: 123456
+      auto-index: update
 
 logging:
   level:

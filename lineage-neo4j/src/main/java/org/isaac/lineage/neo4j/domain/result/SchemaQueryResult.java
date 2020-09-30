@@ -1,7 +1,7 @@
 package org.isaac.lineage.neo4j.domain.result;
 
 import lombok.Data;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
+import org.isaac.lineage.neo4j.domain.node.SchemaNode;
 import org.isaac.lineage.neo4j.domain.node.TableNode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -15,8 +15,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  */
 @QueryResult
 @Data
-public class DbQueryResult {
+public class SchemaQueryResult {
 
-    private DatabaseNode db;
+    private SchemaNode schema;
     private TableNode table;
 }

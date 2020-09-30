@@ -1,11 +1,12 @@
 package org.isaac.lineage.neo4j.utils;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.isaac.lineage.neo4j.domain.LineageMapping;
-import org.isaac.lineage.neo4j.domain.node.DatabaseNode;
-import org.isaac.lineage.neo4j.domain.node.FieldNode;
-import org.isaac.lineage.neo4j.domain.node.TableNode;
+import org.isaac.lineage.neo4j.domain.NodeQualifiedName;
+import org.isaac.lineage.neo4j.domain.node.ClusterNode;
+import org.isaac.lineage.neo4j.domain.node.PlatformNode;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
 
 /**
@@ -18,46 +19,68 @@ import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
  */
 public class LineageUtil {
 
-    private LineageUtil(){
+    private LineageUtil() {
         throw new IllegalStateException();
     }
 
-    public static void genNormalDbNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage){
-        // db
-        lineageMapping.getDatabaseNodeList().forEach(databaseNode -> {
-            Optional.ofNullable(hiveHookMessage.getPlatform()).ifPresent(databaseNode::setPlatform);
-            Optional.ofNullable(hiveHookMessage.getCluster()).ifPresent(databaseNode::setCluster);
-            databaseNode.setPk(String.format(DatabaseNode.PK_FORMAT,
-                    databaseNode.getPlatform(),
-                    databaseNode.getCluster(),
-                    databaseNode.getDatabaseName()));
+    public static void genHivePlatformAndClusterNode(LineageMapping lineageMapping,
+                                                     HiveHookMessage hiveHookMessage) {
+        // platform
+        String platformName = hiveHookMessage.getPlatformName();
+        PlatformNode platformNode = PlatformNode.builder().build();
+        Optional.ofNullable(platformName).ifPresent(platformNode::setPlatformName);
+        platformNode.setPk(platformNode.getPlatformName());
+        lineageMapping.setPlatformNodeList(Collections.singletonList(platformNode));
+        // cluster
+        String clusterName = hiveHookMessage.getClusterName();
+        ClusterNode clusterNode = ClusterNode.builder()
+                .platformName(platformNode.getPlatformName())
+                .build();
+        Optional.ofNullable(clusterName).ifPresent(clusterNode::setClusterName);
+        clusterNode.setPk(NodeQualifiedName.ofCluster(platformNode.getPlatformName(),
+                clusterNode.getClusterName()).toString());
+        lineageMapping.setClusterNodeList(Collections.singletonList(clusterNode));
+    }
+
+    public static void doNodeNormal(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
+        LineageUtil.genNormalSchemaNode(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalTableNode(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalFieldNode(lineageMapping, hiveHookMessage);
+    }
+
+    public static void genNormalSchemaNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
+        // schema
+        lineageMapping.getSchemaNodeList().forEach(schemaNode -> {
+            Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(schemaNode::setPlatformName);
+            Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(schemaNode::setClusterName);
+            schemaNode.setPk(NodeQualifiedName.ofSchema(schemaNode.getPlatformName(),
+                    schemaNode.getClusterName(),
+                    schemaNode.getSchemaName()).toString());
         });
     }
 
-    public static void genNormalTableNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage){
+    public static void genNormalTableNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
         // table
         lineageMapping.getTableNodeList().forEach(tableNode -> {
-            Optional.ofNullable(hiveHookMessage.getPlatform()).ifPresent(tableNode::setPlatform);
-            Optional.ofNullable(hiveHookMessage.getCluster()).ifPresent(tableNode::setCluster);
-            tableNode.setPk(String.format(TableNode.PK_FORMAT,
-                    tableNode.getPlatform(),
-                    tableNode.getCluster(),
-                    tableNode.getDatabaseName(),
-                    tableNode.getTableName()));
+            Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(tableNode::setPlatformName);
+            Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(tableNode::setClusterName);
+            tableNode.setPk(NodeQualifiedName.ofTable(tableNode.getPlatformName(),
+                    tableNode.getClusterName(),
+                    tableNode.getSchemaName(),
+                    tableNode.getTableName()).toString());
         });
     }
 
     public static void genNormalFieldNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
         // field
         lineageMapping.getFieldNodeList().forEach(fieldNode -> {
-            Optional.ofNullable(hiveHookMessage.getPlatform()).ifPresent(fieldNode::setPlatform);
-            Optional.ofNullable(hiveHookMessage.getCluster()).ifPresent(fieldNode::setCluster);
-            fieldNode.setPk(String.format(FieldNode.PK_FORMAT,
-                    fieldNode.getPlatform(),
-                    fieldNode.getCluster(),
-                    fieldNode.getDatabaseName(),
+            Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(fieldNode::setPlatformName);
+            Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(fieldNode::setClusterName);
+            fieldNode.setPk(NodeQualifiedName.ofField(fieldNode.getPlatformName(),
+                    fieldNode.getClusterName(),
+                    fieldNode.getSchemaName(),
                     fieldNode.getTableName(),
-                    fieldNode.getFieldName()));
+                    fieldNode.getFieldName()).toString());
         });
     }
 }
