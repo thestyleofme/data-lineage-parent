@@ -31,7 +31,7 @@ public class KafkaMessageHandler {
         this.lineageExecutor = lineageExecutor;
     }
 
-    @KafkaListener(topics = "TOPIC-METADATA-LINEAGE", groupId = "lineage_handler_group")
+    @KafkaListener(topics = "TOPIC_METADATA_LINEAGE", groupId = "lineage_handler_group")
     public void handle(String record) {
         log.info("handle kafka message......");
         if (StringUtils.isEmpty(record)) {
@@ -48,6 +48,7 @@ public class KafkaMessageHandler {
             return;
         }
         // neo4j进行血缘储存
+        log.debug("neo4j started processing...");
         lineageExecutor.handle(lineageMapping);
     }
 }

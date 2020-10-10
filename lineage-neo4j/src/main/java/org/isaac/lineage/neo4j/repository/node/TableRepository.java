@@ -25,7 +25,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND field.schemaName = table.schemaName " +
             "AND field.tableName = table.tableName " +
             "CREATE (field)-[:FIELD_FROM_TABLE]->(table)")
-    void createRelationshipWithField();
+    void createRelWithField();
 
     /**
      * FIELD_FROM_TABLE
@@ -36,7 +36,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND field.schemaName = table.schemaName " +
             "AND field.tableName = table.tableName " +
             "DELETE r")
-    void deleteRelationshipWithField();
+    void deleteRelWithField();
 
     /**
      * CREATE_TABLE_AS_SELECT
@@ -47,7 +47,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.createTableFrom = table2.pk " +
             "CREATE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
-    void createRelationshipCreateTableAsSelect();
+    void createRelCreateTableAsSelect();
 
     /**
      * CREATE_TABLE_AS_SELECT
@@ -58,7 +58,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.createTableFrom = table2.pk " +
             "DELETE r")
-    void deleteRelationshipCreateTableAsSelect();
+    void deleteRelCreateTableAsSelect();
 
     /**
      * INSERT_OVERWRITE_TABLE_SELECT
@@ -69,7 +69,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.insertOverwriteFrom = table2.pk " +
             "CREATE (table1)-[:INSERT_OVERWRITE_TABLE_SELECT]->(table2)")
-    void createRelationshipInsertOverwriteTableSelect();
+    void createRelInsertOverwriteTableSelect();
 
     /**
      * INSERT_OVERWRITE_TABLE_SELECT
@@ -80,5 +80,5 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.insertOverwriteFrom = table2.pk " +
             "DELETE r")
-    void deleteRelationshipInsertOverwriteTableSelect();
+    void deleteRelInsertOverwriteTableSelect();
 }

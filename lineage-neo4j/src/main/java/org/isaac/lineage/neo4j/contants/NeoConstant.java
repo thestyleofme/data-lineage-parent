@@ -26,6 +26,8 @@ public class NeoConstant {
         public static final String REL_CREATE_TABLE_AS_SELECT = "CREATE_TABLE_AS_SELECT";
         public static final String REL_INSERT_OVERWRITE_TABLE_SELECT = "INSERT_OVERWRITE_TABLE_SELECT";
         public static final String REL_FIELD_FROM_TABLE = "FIELD_FROM_TABLE";
+        public static final String REL_PROCESS_INPUT = "PROCESS_INPUT";
+        public static final String REL_PROCESS_OUTPUT = "PROCESS_OUTPUT";
     }
 
     public static class Properties {
@@ -44,8 +46,16 @@ public class NeoConstant {
         public static final String NODE_SCHEMA = "Schema";
         public static final String NODE_TABLE = "Table";
         public static final String NODE_FIELD = "Field";
+        public static final String NODE_PROCESS = "Process";
         public static final String NODE_TAG = "Tag";
     }
 
+    public static class Status {
+        private Status() {
+        }
+
+        public static final String ACTIVE = "ACTIVE";
+        public static final String DELETED = "DELETED";
+    }
 
 }

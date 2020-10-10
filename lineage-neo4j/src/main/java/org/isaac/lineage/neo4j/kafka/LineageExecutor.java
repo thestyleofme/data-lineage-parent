@@ -25,27 +25,30 @@ public class LineageExecutor {
     private final SchemaRepository schemaRepository;
     private final TableRepository tableRepository;
     private final FieldRepository fieldRepository;
+    private final ProcessRepository processRepository;
 
     public LineageExecutor(PlatformRepository platformRepository,
                            ClusterRepository clusterRepository,
                            SchemaRepository schemaRepository,
                            TableRepository tableRepository,
-                           FieldRepository fieldRepository) {
+                           FieldRepository fieldRepository,
+                           ProcessRepository processRepository) {
         this.platformRepository = platformRepository;
         this.clusterRepository = clusterRepository;
         this.schemaRepository = schemaRepository;
         this.tableRepository = tableRepository;
         this.fieldRepository = fieldRepository;
+        this.processRepository = processRepository;
     }
 
     public void handle(LineageMapping lineageMapping) {
-        // 创建节点 已存在该节点则忽略
-        createNode(lineageMapping);
+        // 创建节点 已存在该节点则更新
+        saveNode(lineageMapping);
         // 创建关系 先删除以前的关系 重新生成
-        createRelationship();
+        saveRelationship();
     }
 
-    private void createNode(LineageMapping lineageMapping) {
+    private void saveNode(LineageMapping lineageMapping) {
         // platform
         Optional.ofNullable(lineageMapping.getPlatformNodeList())
                 .ifPresent(platformNodes -> platformNodes.forEach(this::handlePlatformNode));
@@ -61,6 +64,28 @@ public class LineageExecutor {
         // field
         Optional.ofNullable(lineageMapping.getFieldNodeList())
                 .ifPresent(fieldNodes -> fieldNodes.forEach(this::handleFieldNode));
+        // process
+        Optional.ofNullable(lineageMapping.getProcessNodeList())
+                .ifPresent(processNodes -> processNodes.forEach(this::handleProcessNode));
+    }
+
+    private void handleProcessNode(ProcessNode processNode) {
+        processRepository.save(processNode);
+        // PROCESS_INPUT
+        String processNodePk = processNode.getPk();
+        processNode.getSourceNodePkList().forEach(tablePk -> {
+                    Optional<ProcessNode> optional = processRepository.existsRelProcessInput(tablePk, processNodePk);
+                    if (!optional.isPresent()) {
+                        processRepository.createRelProcessInput(tablePk, processNodePk);
+                    }
+                }
+        );
+        // PROCESS_OUTPUT
+        String targetNodePk = processNode.getTargetNodePk();
+        Optional<ProcessNode> optional = processRepository.existsProcessOutput(processNodePk, targetNodePk);
+        if (!optional.isPresent()) {
+            processRepository.createRelProcessOutput(processNodePk, targetNodePk);
+        }
     }
 
     private void handlePlatformNode(PlatformNode platformNode) {
@@ -83,25 +108,25 @@ public class LineageExecutor {
         fieldRepository.save(fieldNode);
     }
 
-    private void createRelationship() {
+    private void saveRelationship() {
         // CLUSTER_FROM_PLATFORM
-        platformRepository.deleteRelationshipWithCluster();
-        platformRepository.createRelationshipWithCluster();
+        platformRepository.deleteRelWithCluster();
+        platformRepository.createRelWithCluster();
         // SCHEMA_FROM_CLUSTER
-        clusterRepository.deleteRelationshipWithSchema();
-        clusterRepository.createRelationshipWithSchema();
+        clusterRepository.deleteRelWithSchema();
+        clusterRepository.createRelWithSchema();
         // TABLE_FROM_SCHEMA
-        schemaRepository.deleteRelationshipWithTable();
-        schemaRepository.createRelationshipWithTable();
+        schemaRepository.deleteRelWithTable();
+        schemaRepository.createRelWithTable();
         // FIELD_FROM_TABLE
-        tableRepository.deleteRelationshipWithField();
-        tableRepository.createRelationshipWithField();
+        tableRepository.deleteRelWithField();
+        tableRepository.createRelWithField();
         // CREATE_TABLE_AS_SELECT
-        tableRepository.deleteRelationshipCreateTableAsSelect();
-        tableRepository.createRelationshipCreateTableAsSelect();
+        tableRepository.deleteRelCreateTableAsSelect();
+        tableRepository.createRelCreateTableAsSelect();
         // INSERT_OVERWRITE_TABLE_SELECT
-        tableRepository.deleteRelationshipInsertOverwriteTableSelect();
-        tableRepository.createRelationshipInsertOverwriteTableSelect();
+        tableRepository.deleteRelInsertOverwriteTableSelect();
+        tableRepository.createRelInsertOverwriteTableSelect();
     }
 
 }

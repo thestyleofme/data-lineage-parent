@@ -29,4 +29,5 @@ public class LineageMapping {
     private List<SchemaNode> schemaNodeList;
     private List<TableNode> tableNodeList;
     private List<FieldNode> fieldNodeList;
+    private List<ProcessNode> processNodeList;
 }

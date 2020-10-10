@@ -27,7 +27,7 @@ public interface SchemaRepository extends Neo4jRepository<SchemaNode, String> {
             "AND table.clusterName = s.clusterName " +
             "AND table.schemaName = s.schemaName " +
             "CREATE (table)-[r:TABLE_FROM_SCHEMA]->(s)")
-    void createRelationshipWithTable();
+    void createRelWithTable();
 
     /**
      * TABLE_FROM_SCHEMA
@@ -37,7 +37,7 @@ public interface SchemaRepository extends Neo4jRepository<SchemaNode, String> {
             "AND table.clusterName = s.clusterName " +
             "AND table.schemaName = s.schemaName " +
             "DELETE r")
-    void deleteRelationshipWithTable();
+    void deleteRelWithTable();
 
     /**
      * 血缘分析查找该库下有哪些表

@@ -76,7 +76,7 @@ public class HiveEntity implements Serializable {
 
     private static volatile Properties hiveHookProperties;
 
-    public static void get() {
+    public static void loadHiveProperties() {
         if (hiveHookProperties == null) {
             synchronized (HiveEntity.class) {
                 if (hiveHookProperties == null) {
@@ -91,7 +91,7 @@ public class HiveEntity implements Serializable {
         // kafka里有多个来源 这里标识下是从hive hook发送的 方便后面使用此sourceType进行解析
         entity.put("sourceType", "HIVE-HOOK");
         // 读取文件放入额外信息到hook中 主要是做系统以及集群血缘
-        get();
+        loadHiveProperties();
         Set<Map.Entry<Object, Object>> entries = hiveHookProperties.entrySet();
         for (Map.Entry<Object, Object> entry : entries) {
             entity.put(String.valueOf(entry.getKey()), entry.getValue());
@@ -105,10 +105,9 @@ public class HiveEntity implements Serializable {
      */
     private static Properties readHiveHookProperties() {
         Properties properties = new Properties();
-        try {
-            String confLocation = PathUtils.getProjectPath();
-            File file = new File(confLocation, "hook.properties");
-            FileInputStream fileInputStream = new FileInputStream(file);
+        String confLocation = PathUtils.getProjectPath();
+        File file = new File(confLocation, "hook.properties");
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
             properties.load(fileInputStream);
             return properties;
         } catch (IOException e) {

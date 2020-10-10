@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.isaac.lineage.neo4j.contants.NeoConstant;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.Version;
@@ -24,11 +25,11 @@ public abstract class BaseNodeEntity extends BaseEntity {
     @Index(unique = true)
     private String pk;
 
-    private String status;
+    private String status = NeoConstant.Status.ACTIVE;
     private String createdBy;
     private String updatedBy;
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+    private LocalDateTime updateTime = LocalDateTime.now();
 
     /**
      * Optimistic lock field
@@ -40,9 +41,10 @@ public abstract class BaseNodeEntity extends BaseEntity {
      */
     private String name;
 
-    /**
-     * redundant field
-     */
+    //===============================================================================
+    //  redundant field
+    //===============================================================================
+
     private Long tenantId;
     private String datasourceCode;
     private String clusterName = "DEFAULT";

@@ -32,16 +32,16 @@ public class CreateTableHandler {
                               HiveHookMessage hiveHookMessage,
                               Map<String, Object> attributes) {
         Map<String, Object> hiveTableMap = (Map<String, Object>) attributes.get(HiveEventType.HIVE_TABLE.getName());
-        CreateTableEvent createTableEvent = JsonUtil.toObj(JsonUtil.toJson(hiveTableMap), CreateTableEvent.class);
+        BaseAttribute createTableEvent = JsonUtil.toObj(JsonUtil.toJson(hiveTableMap), BaseAttribute.class);
         // 生成node信息
-        doCreateNode(lineageMapping, hiveHookMessage, createTableEvent);
+        genAllNode(lineageMapping, hiveHookMessage, createTableEvent);
         // node的冗余字段处理
         LineageUtil.doNodeNormal(lineageMapping, hiveHookMessage);
     }
 
-    private static void doCreateNode(LineageMapping lineageMapping,
-                                     HiveHookMessage hiveHookMessage,
-                                     CreateTableEvent createTableEvent) {
+    private static void genAllNode(LineageMapping lineageMapping,
+                                   HiveHookMessage hiveHookMessage,
+                                   BaseAttribute createTableEvent) {
         // platform cluster
         LineageUtil.genHivePlatformAndClusterNode(lineageMapping, hiveHookMessage);
         // schema
@@ -53,7 +53,7 @@ public class CreateTableHandler {
     }
 
     private static void genSchemaNode(LineageMapping lineageMapping,
-                                      CreateTableEvent createTableEvent) {
+                                      BaseAttribute createTableEvent) {
         SchemaNode schemaNode = SchemaNode.builder()
                 .schemaName(createTableEvent.getDb())
                 .build();
@@ -62,7 +62,7 @@ public class CreateTableHandler {
 
     private static void genTableNode(LineageMapping lineageMapping,
                                      HiveHookMessage hiveHookMessage,
-                                     CreateTableEvent createTableEvent) {
+                                     BaseAttribute createTableEvent) {
         TableNode tableNode = TableNode.builder()
                 .schemaName(createTableEvent.getDb())
                 .tableName(createTableEvent.getName())
@@ -72,7 +72,7 @@ public class CreateTableHandler {
     }
 
     private static void genFieldNode(LineageMapping lineageMapping,
-                                     CreateTableEvent createTableEvent) {
+                                     BaseAttribute createTableEvent) {
         ArrayList<FieldNode> list = new ArrayList<>();
         createTableEvent.getColumns().forEach(columnsDTO -> {
             FieldNode fieldNode = FieldNode.builder().build();

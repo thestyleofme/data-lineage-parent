@@ -23,7 +23,7 @@ public interface ClusterRepository extends Neo4jRepository<ClusterNode, String> 
             "WHERE c.platformName = s.platformName  " +
             "AND c.clusterName = s.clusterName  " +
             "CREATE (s)-[r:SCHEMA_FROM_CLUSTER]->(c)")
-    void createRelationshipWithSchema();
+    void createRelWithSchema();
 
     /**
      * SCHEMA_FROM_CLUSTER
@@ -32,5 +32,5 @@ public interface ClusterRepository extends Neo4jRepository<ClusterNode, String> 
             "WHERE c.platformName = s.platformName  " +
             "AND c.clusterName = s.clusterName  " +
             "DELETE r")
-    void deleteRelationshipWithSchema();
+    void deleteRelWithSchema();
 }

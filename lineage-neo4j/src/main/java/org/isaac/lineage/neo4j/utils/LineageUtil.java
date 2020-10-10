@@ -1,13 +1,18 @@
 package org.isaac.lineage.neo4j.utils;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.domain.NodeQualifiedName;
 import org.isaac.lineage.neo4j.domain.node.ClusterNode;
 import org.isaac.lineage.neo4j.domain.node.PlatformNode;
+import org.isaac.lineage.neo4j.domain.node.ProcessNode;
+import org.isaac.lineage.neo4j.domain.node.TableNode;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
+import org.springframework.util.DigestUtils;
 
 /**
  * <p>
@@ -44,7 +49,7 @@ public class LineageUtil {
 
     public static void doNodeNormal(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
         LineageUtil.genNormalSchemaNode(lineageMapping, hiveHookMessage);
-        LineageUtil.genNormalTableNode(lineageMapping, hiveHookMessage);
+        LineageUtil.genNormalTableNode(lineageMapping.getTableNodeList(), hiveHookMessage);
         LineageUtil.genNormalFieldNode(lineageMapping, hiveHookMessage);
     }
 
@@ -59,16 +64,25 @@ public class LineageUtil {
         });
     }
 
-    public static void genNormalTableNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
+    public static void genNormalTableNode(List<TableNode> tableNodeList, HiveHookMessage hiveHookMessage) {
         // table
-        lineageMapping.getTableNodeList().forEach(tableNode -> {
-            Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(tableNode::setPlatformName);
-            Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(tableNode::setClusterName);
-            tableNode.setPk(NodeQualifiedName.ofTable(tableNode.getPlatformName(),
-                    tableNode.getClusterName(),
-                    tableNode.getSchemaName(),
-                    tableNode.getTableName()).toString());
-        });
+        tableNodeList.forEach(tableNode ->
+                doNormalTableNode(hiveHookMessage, tableNode)
+        );
+    }
+
+    public static void doNormalTableNode(HiveHookMessage hiveHookMessage, TableNode tableNode) {
+        Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(tableNode::setPlatformName);
+        Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(tableNode::setClusterName);
+        tableNode.setPk(NodeQualifiedName.ofTable(tableNode.getPlatformName(),
+                tableNode.getClusterName(),
+                tableNode.getSchemaName(),
+                tableNode.getTableName()).toString());
+    }
+
+    public static void doNormalProcessNode(HiveHookMessage hiveHookMessage, ProcessNode processNode) {
+        Optional.ofNullable(hiveHookMessage.getPlatformName()).ifPresent(processNode::setPlatformName);
+        Optional.ofNullable(hiveHookMessage.getClusterName()).ifPresent(processNode::setClusterName);
     }
 
     public static void genNormalFieldNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
@@ -82,5 +96,15 @@ public class LineageUtil {
                     fieldNode.getTableName(),
                     fieldNode.getFieldName()).toString());
         });
+    }
+
+    public static String genProcessNodePk(ProcessNode processNode) {
+        // sourceNodePkList：x,y
+        // targetNodePk: z
+        // md5(targetNodePk + sourceNodePkList排序后使用下划线'_'连接)
+        List<String> sourceNodePkList = processNode.getSourceNodePkList();
+        sourceNodePkList.sort(Comparator.naturalOrder());
+        String key = processNode.getTargetNodePk() + "_" + String.join("_", sourceNodePkList);
+        return DigestUtils.md5DigestAsHex(key.getBytes());
     }
 }

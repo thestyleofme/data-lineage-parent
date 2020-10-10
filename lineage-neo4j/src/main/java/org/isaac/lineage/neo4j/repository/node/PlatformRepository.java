@@ -22,7 +22,7 @@ public interface PlatformRepository extends Neo4jRepository<PlatformNode, String
     @Query("MATCH (p:Platform),(c:Cluster) " +
             "WHERE p.platformName = c.platformName  " +
             "CREATE (c)-[r:CLUSTER_FROM_PLATFORM]->(p)")
-    void createRelationshipWithCluster();
+    void createRelWithCluster();
 
     /**
      * CLUSTER_FROM_PLATFORM
@@ -30,5 +30,5 @@ public interface PlatformRepository extends Neo4jRepository<PlatformNode, String
     @Query("MATCH (c:Cluster)-[r:CLUSTER_FROM_PLATFORM]->(p:Platform) " +
             "WHERE c.platformName = p.platformName " +
             "DELETE r")
-    void deleteRelationshipWithCluster();
+    void deleteRelWithCluster();
 }
