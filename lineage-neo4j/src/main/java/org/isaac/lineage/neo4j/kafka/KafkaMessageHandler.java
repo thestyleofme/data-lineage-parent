@@ -5,6 +5,7 @@ import org.isaac.lineage.neo4j.context.KafkaHandlerContext;
 import org.isaac.lineage.neo4j.domain.KafkaMessage;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
+import org.isaac.lineage.neo4j.kafka.handler.BaseLineageHandler;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -50,5 +51,8 @@ public class KafkaMessageHandler {
         // neo4j进行血缘储存
         log.debug("neo4j started processing...");
         lineageExecutor.handle(lineageMapping);
+        // 扩展点
+        BaseLineageHandler lineageHandler = kafkaHandlerContext.getLineageHandler(sourceType);
+        lineageHandler.handle(lineageMapping);
     }
 }

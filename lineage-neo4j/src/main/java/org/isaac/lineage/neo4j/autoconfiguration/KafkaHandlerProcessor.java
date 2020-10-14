@@ -3,6 +3,7 @@ package org.isaac.lineage.neo4j.autoconfiguration;
 import org.isaac.lineage.neo4j.annotation.SourceType;
 import org.isaac.lineage.neo4j.context.KafkaHandlerContext;
 import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
+import org.isaac.lineage.neo4j.kafka.handler.BaseLineageHandler;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -28,10 +29,16 @@ public class KafkaHandlerProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, @NonNull String beanName) {
         Class<?> clazz = bean.getClass();
         SourceType sourceType = clazz.getAnnotation(SourceType.class);
-        if (sourceType == null || !(bean instanceof BaseKafkaHandler)) {
+        if (sourceType == null) {
             return bean;
         }
         String value = sourceType.value();
+        if(bean instanceof BaseKafkaHandler){
+            kafkaHandlerContext.register(value.toUpperCase(), (BaseKafkaHandler) bean);
+        }
+        if(bean instanceof BaseLineageHandler){
+            kafkaHandlerContext.register(value.toUpperCase(), (BaseLineageHandler) bean);
+        }
         kafkaHandlerContext.register(value.toUpperCase(), (BaseKafkaHandler) bean);
         return bean;
     }

@@ -45,7 +45,7 @@ public class LineageExecutor {
         // 创建节点 已存在该节点则更新
         saveNode(lineageMapping);
         // 创建关系 先删除以前的关系 重新生成
-        saveRelationship();
+        saveNormalRelationship();
     }
 
     private void saveNode(LineageMapping lineageMapping) {
@@ -108,7 +108,7 @@ public class LineageExecutor {
         fieldRepository.save(fieldNode);
     }
 
-    private void saveRelationship() {
+    private void saveNormalRelationship() {
         // CLUSTER_FROM_PLATFORM
         platformRepository.deleteRelWithCluster();
         platformRepository.createRelWithCluster();
@@ -121,12 +121,6 @@ public class LineageExecutor {
         // FIELD_FROM_TABLE
         tableRepository.deleteRelWithField();
         tableRepository.createRelWithField();
-        // CREATE_TABLE_AS_SELECT
-        tableRepository.deleteRelCreateTableAsSelect();
-        tableRepository.createRelCreateTableAsSelect();
-        // INSERT_OVERWRITE_TABLE_SELECT
-        tableRepository.deleteRelInsertOverwriteTableSelect();
-        tableRepository.createRelInsertOverwriteTableSelect();
     }
 
 }
