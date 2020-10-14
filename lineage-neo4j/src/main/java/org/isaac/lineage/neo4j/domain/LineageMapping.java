@@ -1,5 +1,6 @@
 package org.isaac.lineage.neo4j.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,10 +25,10 @@ import org.isaac.lineage.neo4j.domain.node.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineageMapping {
 
-    private List<PlatformNode> platformNodeList;
-    private List<ClusterNode> clusterNodeList;
-    private List<SchemaNode> schemaNodeList;
-    private List<TableNode> tableNodeList;
-    private List<FieldNode> fieldNodeList;
-    private List<ProcessNode> processNodeList;
+    private List<PlatformNode> platformNodeList = new ArrayList<>();
+    private List<ClusterNode> clusterNodeList = new ArrayList<>();
+    private List<SchemaNode> schemaNodeList = new ArrayList<>();
+    private List<TableNode> tableNodeList = new ArrayList<>();
+    private List<FieldNode> fieldNodeList = new ArrayList<>();
+    private List<ProcessNode> processNodeList = new ArrayList<>();
 }

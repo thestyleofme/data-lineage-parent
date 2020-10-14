@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class CreateTableAsEvent {
+public class HiveTableProcessEvent {
 
     private List<BaseAttribute> outputs;
     private List<BaseAttribute> inputs;

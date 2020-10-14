@@ -8,18 +8,20 @@ package org.isaac.lineage.neo4j.kafka.handler.hive;
  * @author isaac 2020/09/23 11:43
  * @since 1.0.0
  */
-public enum HiveEventType {
+public enum HiveOperationEnum {
 
     /**
      * CreateTable event
      */
-    HIVE_TABLE("hive_table"),
-    HIVE_PROCESS("hive_process"),
+    CREATETABLE("CREATETABLE"),
+    CREATETABLE_AS_SELECT("CREATETABLE_AS_SELECT"),
+    DROPTABLE("DROPTABLE"),
+    QUERY("QUERY")
     ;
 
     private final String name;
 
-    HiveEventType(String name) {
+    HiveOperationEnum(String name) {
         this.name = name;
     }
 

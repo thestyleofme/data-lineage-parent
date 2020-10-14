@@ -39,7 +39,6 @@ public class KafkaHandlerProcessor implements BeanPostProcessor {
         if(bean instanceof BaseLineageHandler){
             kafkaHandlerContext.register(value.toUpperCase(), (BaseLineageHandler) bean);
         }
-        kafkaHandlerContext.register(value.toUpperCase(), (BaseKafkaHandler) bean);
         return bean;
     }
 }

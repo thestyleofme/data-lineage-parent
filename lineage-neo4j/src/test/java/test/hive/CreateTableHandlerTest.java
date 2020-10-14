@@ -4,6 +4,7 @@ import org.isaac.lineage.neo4j.LineageNeo4jApplication;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.kafka.LineageExecutor;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveKafkaHandler;
+import org.isaac.lineage.neo4j.kafka.handler.hive.HiveLineageHandler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,8 @@ public class CreateTableHandlerTest {
     private HiveKafkaHandler hiveKafkaHandler;
     @Autowired
     private LineageExecutor lineageExecutor;
+    @Autowired
+    private HiveLineageHandler hiveLineageHandler;
 
     @Test
     public void test() {
@@ -96,5 +99,6 @@ public class CreateTableHandlerTest {
         LineageMapping lineageMapping = hiveKafkaHandler.handle(record);
         Assert.assertNotNull(lineageMapping);
         lineageExecutor.handle(lineageMapping);
+        hiveLineageHandler.handle(lineageMapping);
     }
 }

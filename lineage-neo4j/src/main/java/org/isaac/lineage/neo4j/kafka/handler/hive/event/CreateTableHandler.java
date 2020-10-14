@@ -1,14 +1,12 @@
 package org.isaac.lineage.neo4j.kafka.handler.hive.event;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.domain.node.FieldNode;
 import org.isaac.lineage.neo4j.domain.node.SchemaNode;
 import org.isaac.lineage.neo4j.domain.node.TableNode;
-import org.isaac.lineage.neo4j.kafka.handler.hive.HiveEventType;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
 import org.isaac.lineage.neo4j.utils.LineageUtil;
@@ -31,7 +29,7 @@ public class CreateTableHandler {
     public static void handle(LineageMapping lineageMapping,
                               HiveHookMessage hiveHookMessage,
                               Map<String, Object> attributes) {
-        Map<String, Object> hiveTableMap = (Map<String, Object>) attributes.get(HiveEventType.HIVE_TABLE.getName());
+        Map<String, Object> hiveTableMap = (Map<String, Object>) attributes.get("hive_table");
         BaseAttribute createTableEvent = JsonUtil.toObj(JsonUtil.toJson(hiveTableMap), BaseAttribute.class);
         // 生成node信息
         genAllNode(lineageMapping, hiveHookMessage, createTableEvent);
@@ -57,7 +55,7 @@ public class CreateTableHandler {
         SchemaNode schemaNode = SchemaNode.builder()
                 .schemaName(createTableEvent.getDb())
                 .build();
-        lineageMapping.setSchemaNodeList(Collections.singletonList(schemaNode));
+        lineageMapping.getSchemaNodeList().add(schemaNode);
     }
 
     private static void genTableNode(LineageMapping lineageMapping,
@@ -68,7 +66,7 @@ public class CreateTableHandler {
                 .tableName(createTableEvent.getName())
                 .sql(hiveHookMessage.getQueryStr())
                 .build();
-        lineageMapping.setTableNodeList(Collections.singletonList(tableNode));
+        lineageMapping.getTableNodeList().add(tableNode);
     }
 
     private static void genFieldNode(LineageMapping lineageMapping,
@@ -82,7 +80,7 @@ public class CreateTableHandler {
             fieldNode.setFieldType(columnsDTO.getType());
             list.add(fieldNode);
         });
-        lineageMapping.setFieldNodeList(list);
+        lineageMapping.getFieldNodeList().addAll(list);
     }
 
 }

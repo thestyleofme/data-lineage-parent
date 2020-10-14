@@ -8,6 +8,8 @@ import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
 import org.isaac.lineage.neo4j.kafka.handler.hive.event.CreateTableAsHandler;
 import org.isaac.lineage.neo4j.kafka.handler.hive.event.CreateTableHandler;
+import org.isaac.lineage.neo4j.kafka.handler.hive.event.DropTableHandler;
+import org.isaac.lineage.neo4j.kafka.handler.hive.event.QueryHandler;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -48,16 +50,22 @@ public class HiveKafkaHandler implements BaseKafkaHandler {
 
     private void generateLineageNode(LineageMapping lineageMapping, HiveHookMessage hiveHookMessage) {
         Map<String, Object> attributes = hiveHookMessage.getAttributes();
-        // 当operationName=QUERY时，attributes为空，QUERY操作我们不需要记录血缘
+        // attributes为空，我们不需要记录血缘
         if (CollectionUtils.isEmpty(attributes)) {
             return;
         }
-        switch (HiveEventType.valueOf(hiveHookMessage.getTypeName().toUpperCase())) {
-            case HIVE_TABLE:
+        switch (HiveOperationEnum.valueOf(hiveHookMessage.getOperationName().toUpperCase())) {
+            case QUERY:
+                QueryHandler.handle(lineageMapping, hiveHookMessage, attributes);
+                break;
+            case CREATETABLE:
                 CreateTableHandler.handle(lineageMapping, hiveHookMessage, attributes);
                 break;
-            case HIVE_PROCESS:
+            case CREATETABLE_AS_SELECT:
                 CreateTableAsHandler.handle(lineageMapping, hiveHookMessage, attributes);
+                break;
+            case DROPTABLE:
+                DropTableHandler.handler(lineageMapping,hiveHookMessage, attributes);
                 break;
             default:
                 break;
