@@ -1,5 +1,6 @@
 package org.isaac.lineage.neo4j.kafka;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.domain.node.*;
 import org.isaac.lineage.neo4j.repository.node.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * <p>
@@ -73,13 +75,16 @@ public class LineageExecutor {
         processRepository.save(processNode);
         // PROCESS_INPUT
         String processNodePk = processNode.getPk();
-        processNode.getSourceNodePkList().forEach(tablePk -> {
-                    Optional<ProcessNode> optional = processRepository.existsRelProcessInput(tablePk, processNodePk);
-                    if (!optional.isPresent()) {
-                        processRepository.createRelProcessInput(tablePk, processNodePk);
+        List<String> sourceNodePkList = processNode.getSourceNodePkList();
+        if (!CollectionUtils.isEmpty(sourceNodePkList)) {
+            sourceNodePkList.forEach(tablePk -> {
+                        Optional<ProcessNode> optional = processRepository.existsRelProcessInput(tablePk, processNodePk);
+                        if (!optional.isPresent()) {
+                            processRepository.createRelProcessInput(tablePk, processNodePk);
+                        }
                     }
-                }
-        );
+            );
+        }
         // PROCESS_OUTPUT
         String targetNodePk = processNode.getTargetNodePk();
         Optional<ProcessNode> optional = processRepository.existsProcessOutput(processNodePk, targetNodePk);

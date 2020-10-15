@@ -1,6 +1,7 @@
 package org.isaac.lineage.neo4j.kafka.handler.hive.event;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.domain.node.FieldNode;
@@ -33,23 +34,22 @@ public class HiveTableProcessUtil {
     }
 
     public static void genFieldNode(LineageMapping lineageMapping,
-                                     HiveTableProcessEvent hiveTableProcessEvent) {
+                                    List<BaseAttribute> baseAttributeList) {
         ArrayList<FieldNode> list = new ArrayList<>();
-        hiveTableProcessEvent.getOutputs().forEach(outputsDTO ->
-                outputsDTO.getColumns().forEach(columnsDTO -> {
+        baseAttributeList.forEach(baseAttribute ->
+                baseAttribute.getColumns().forEach(columnsDTO -> {
                     FieldNode fieldNode = genColumn(columnsDTO);
-                    fieldNode.setSchemaName(outputsDTO.getDb());
-                    fieldNode.setTableName(outputsDTO.getName());
-                    list.add(fieldNode);
-                }));
-        hiveTableProcessEvent.getInputs().forEach(inputsDTO ->
-                inputsDTO.getColumns().forEach(columnsDTO -> {
-                    FieldNode fieldNode = genColumn(columnsDTO);
-                    fieldNode.setSchemaName(inputsDTO.getDb());
-                    fieldNode.setTableName(inputsDTO.getName());
+                    fieldNode.setSchemaName(baseAttribute.getDb());
+                    fieldNode.setTableName(baseAttribute.getName());
                     list.add(fieldNode);
                 }));
         lineageMapping.getFieldNodeList().addAll(list);
+    }
+
+    public static void genFieldNode(LineageMapping lineageMapping,
+                                     HiveTableProcessEvent hiveTableProcessEvent) {
+        genFieldNode(lineageMapping,hiveTableProcessEvent.getOutputs());
+        genFieldNode(lineageMapping,hiveTableProcessEvent.getInputs());
     }
 
     public static FieldNode genColumn(BaseAttribute.ColumnsDTO columnsDTO) {

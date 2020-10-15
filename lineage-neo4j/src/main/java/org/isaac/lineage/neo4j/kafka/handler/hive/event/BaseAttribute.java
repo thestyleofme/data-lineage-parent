@@ -47,6 +47,11 @@ public class BaseAttribute {
     private String db;
     private Integer retention;
     private List<ColumnsDTO> columns;
+    /**
+     * load data inpath '/hive_load_lineage_test005.csv' into table lineage_test005;
+     * 这里的inpath即path
+     */
+    private String path;
 
     @NoArgsConstructor
     @Data

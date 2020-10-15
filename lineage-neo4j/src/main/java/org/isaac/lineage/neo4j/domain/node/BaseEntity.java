@@ -1,11 +1,13 @@
 package org.isaac.lineage.neo4j.domain.node;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.isaac.lineage.neo4j.contants.NeoConstant;
 import org.neo4j.ogm.annotation.Properties;
+import org.springframework.util.CollectionUtils;
 
 /**
  * <p>
@@ -28,4 +30,15 @@ public abstract class BaseEntity {
      */
     @Properties(prefix = NeoConstant.ENTITY_EXTRA_PREFIX)
     private Map<String, String> extra;
+
+    public Map<String, String> getExtra() {
+        if (CollectionUtils.isEmpty(extra)) {
+            synchronized (this) {
+                if (CollectionUtils.isEmpty(extra)) {
+                    this.extra = new HashMap<>(8);
+                }
+            }
+        }
+        return this.extra;
+    }
 }

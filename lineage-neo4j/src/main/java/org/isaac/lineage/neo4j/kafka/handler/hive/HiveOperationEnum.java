@@ -16,7 +16,8 @@ public enum HiveOperationEnum {
     CREATETABLE("CREATETABLE"),
     CREATETABLE_AS_SELECT("CREATETABLE_AS_SELECT"),
     DROPTABLE("DROPTABLE"),
-    QUERY("QUERY")
+    QUERY("QUERY"),
+    LOAD("LOAD"),
     ;
 
     private final String name;

@@ -1,7 +1,9 @@
 package org.isaac.lineage.neo4j.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -31,4 +33,6 @@ public class LineageMapping {
     private List<TableNode> tableNodeList = new ArrayList<>();
     private List<FieldNode> fieldNodeList = new ArrayList<>();
     private List<ProcessNode> processNodeList = new ArrayList<>();
+
+    private Map<String, Object> extMap = new HashMap<>();
 }

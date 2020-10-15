@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.isaac.lineage.neo4j.annotation.SourceType;
 import org.isaac.lineage.neo4j.domain.LineageMapping;
 import org.isaac.lineage.neo4j.kafka.handler.BaseKafkaHandler;
-import org.isaac.lineage.neo4j.kafka.handler.hive.event.CreateTableAsHandler;
-import org.isaac.lineage.neo4j.kafka.handler.hive.event.CreateTableHandler;
-import org.isaac.lineage.neo4j.kafka.handler.hive.event.DropTableHandler;
-import org.isaac.lineage.neo4j.kafka.handler.hive.event.QueryHandler;
+import org.isaac.lineage.neo4j.kafka.handler.hive.event.*;
 import org.isaac.lineage.neo4j.utils.JsonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -66,6 +63,9 @@ public class HiveKafkaHandler implements BaseKafkaHandler {
                 break;
             case DROPTABLE:
                 DropTableHandler.handler(lineageMapping,hiveHookMessage, attributes);
+                break;
+            case LOAD:
+                LoadHandler.handler(lineageMapping,hiveHookMessage, attributes);
                 break;
             default:
                 break;

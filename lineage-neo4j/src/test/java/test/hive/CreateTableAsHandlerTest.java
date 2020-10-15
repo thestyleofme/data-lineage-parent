@@ -166,6 +166,7 @@ public class CreateTableAsHandlerTest {
         LineageMapping lineageMapping = hiveKafkaHandler.handle(record);
         Assert.assertNotNull(lineageMapping);
         lineageExecutor.handle(lineageMapping);
+        hiveLineageHandler.handle(lineageMapping);
     }
 
     @Test

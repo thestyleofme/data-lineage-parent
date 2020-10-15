@@ -12,6 +12,7 @@ import org.isaac.lineage.neo4j.domain.node.PlatformNode;
 import org.isaac.lineage.neo4j.domain.node.ProcessNode;
 import org.isaac.lineage.neo4j.domain.node.TableNode;
 import org.isaac.lineage.neo4j.kafka.handler.hive.HiveHookMessage;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -103,6 +104,9 @@ public class LineageUtil {
         // targetNodePk: z
         // md5(targetNodePk + sourceNodePkList排序后使用下划线'_'连接)
         List<String> sourceNodePkList = processNode.getSourceNodePkList();
+        if (CollectionUtils.isEmpty(sourceNodePkList)) {
+            return DigestUtils.md5DigestAsHex(processNode.getTargetNodePk().getBytes());
+        }
         sourceNodePkList.sort(Comparator.naturalOrder());
         String key = processNode.getTargetNodePk() + "_" + String.join("_", sourceNodePkList);
         return DigestUtils.md5DigestAsHex(key.getBytes());
