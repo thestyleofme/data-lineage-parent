@@ -24,7 +24,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND field.clusterName = table.clusterName " +
             "AND field.schemaName = table.schemaName " +
             "AND field.tableName = table.tableName " +
-            "CREATE (field)-[:FIELD_FROM_TABLE]->(table)")
+            "MERGE (field)-[:FIELD_FROM_TABLE]->(table)")
     void createRelWithField();
 
     /**
@@ -46,7 +46,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.clusterName = table2.clusterName " +
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.createTableFrom = table2.pk " +
-            "CREATE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
+            "MERGE (table1)-[:CREATE_TABLE_AS_SELECT]->(table2)")
     void createRelCreateTableAsSelect();
 
     /**
@@ -68,7 +68,7 @@ public interface TableRepository extends Neo4jRepository<TableNode, String> {
             "AND table1.clusterName = table2.clusterName " +
             "AND table1.schemaName = table2.schemaName " +
             "AND table1.insertOverwriteFrom = table2.pk " +
-            "CREATE (table1)-[:INSERT_OVERWRITE_TABLE_SELECT]->(table2)")
+            "MERGE (table1)-[:INSERT_OVERWRITE_TABLE_SELECT]->(table2)")
     void createRelInsertOverwriteTableSelect();
 
     /**

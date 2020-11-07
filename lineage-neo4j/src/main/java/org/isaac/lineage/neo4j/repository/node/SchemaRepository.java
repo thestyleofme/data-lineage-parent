@@ -26,7 +26,7 @@ public interface SchemaRepository extends Neo4jRepository<SchemaNode, String> {
             "WHERE table.platformName = s.platformName  " +
             "AND table.clusterName = s.clusterName " +
             "AND table.schemaName = s.schemaName " +
-            "CREATE (table)-[r:TABLE_FROM_SCHEMA]->(s)")
+            "MERGE (table)-[r:TABLE_FROM_SCHEMA]->(s)")
     void createRelWithTable();
 
     /**

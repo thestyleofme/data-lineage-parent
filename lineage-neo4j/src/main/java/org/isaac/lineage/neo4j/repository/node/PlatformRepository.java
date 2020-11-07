@@ -21,7 +21,7 @@ public interface PlatformRepository extends Neo4jRepository<PlatformNode, String
      */
     @Query("MATCH (p:Platform),(c:Cluster) " +
             "WHERE p.platformName = c.platformName  " +
-            "CREATE (c)-[r:CLUSTER_FROM_PLATFORM]->(p)")
+            "MERGE (c)-[r:CLUSTER_FROM_PLATFORM]->(p)")
     void createRelWithCluster();
 
     /**

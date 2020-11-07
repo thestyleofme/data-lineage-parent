@@ -46,7 +46,7 @@ public class LineageExecutor {
     public void handle(LineageMapping lineageMapping) {
         // 创建节点 已存在该节点则更新
         saveNode(lineageMapping);
-        // 创建关系 先删除以前的关系 重新生成
+        // 重新生成关系
         saveNormalRelationship();
     }
 
@@ -115,16 +115,12 @@ public class LineageExecutor {
 
     private void saveNormalRelationship() {
         // CLUSTER_FROM_PLATFORM
-        platformRepository.deleteRelWithCluster();
         platformRepository.createRelWithCluster();
         // SCHEMA_FROM_CLUSTER
-        clusterRepository.deleteRelWithSchema();
         clusterRepository.createRelWithSchema();
         // TABLE_FROM_SCHEMA
-        schemaRepository.deleteRelWithTable();
         schemaRepository.createRelWithTable();
         // FIELD_FROM_TABLE
-        tableRepository.deleteRelWithField();
         tableRepository.createRelWithField();
     }
 

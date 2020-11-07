@@ -22,7 +22,7 @@ public interface ClusterRepository extends Neo4jRepository<ClusterNode, String> 
     @Query("MATCH (c:Cluster),(s:Schema) " +
             "WHERE c.platformName = s.platformName  " +
             "AND c.clusterName = s.clusterName  " +
-            "CREATE (s)-[r:SCHEMA_FROM_CLUSTER]->(c)")
+            "MERGE (s)-[r:SCHEMA_FROM_CLUSTER]->(c)")
     void createRelWithSchema();
 
     /**

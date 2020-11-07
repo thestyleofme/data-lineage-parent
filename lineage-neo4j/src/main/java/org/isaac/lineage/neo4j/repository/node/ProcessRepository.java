@@ -30,7 +30,7 @@ public interface ProcessRepository extends Neo4jRepository<ProcessNode, String> 
             "AND t.clusterName = p.clusterName  " +
             "AND t.pk = $tablePk  " +
             "AND p.pk = $processPk  " +
-            "CREATE (t)-[r:PROCESS_INPUT]->(p)")
+            "MERGE (t)-[r:PROCESS_INPUT]->(p)")
     void createRelProcessInput(@Param("tablePk") String tablePk, @Param("processPk") String processPk);
 
     /**
